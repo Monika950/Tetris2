@@ -1,0 +1,10 @@
+
+
+enum SquareEmpty {
+    E = 'E',
+};
+
+
+
+
+
