@@ -8,9 +8,9 @@ interface SquareProps
     type:SquareType;
 }
 
-const Square: React.FC = ({type}) => {
+const Square: React.FC<SquareProps> = ({type}) => {
   return (
-    <div className="square" />
+    <div className={`square ${type}`} />
   );
 };
 

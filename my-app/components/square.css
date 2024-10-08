@@ -2,9 +2,38 @@
     width: 30px;
     aspect-ratio: 1;
     border: 1px solid black;
-    background-color: grey;
-  }
+}
 
-
+.square.S {
+    background-color: green;
+}
+  
+.square.Z {
+    background-color: red;
+}
+  
+.square.J {
+    background-color: blue;
+}
+  
+.square.L {
+    background-color: orange;
+}
+  
+.square.I {
+    background-color: cyan;
+}
+  
+.square.O {
+    background-color: yellow;
+}
+  
+.square.T {
+    background-color: purple;
+}
+  
+.square.E {
+    background-color: lightgray; 
+}
 
   

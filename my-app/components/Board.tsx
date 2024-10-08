@@ -1,27 +1,21 @@
 import './board.css'
 import Square from './Square';
+import { SquareType } from './type';
 
 interface BoardProps
 {
-    board: Square[][];
+    board: SquareType[][];
 }
 
-function Board()
+function Board({board}: BoardProps)
 {
-    const rows = 10; 
-    const columns = 20;
-
-    const board: JSX.Element[][] = Array.from({ length: rows }, () =>
-        Array.from({ length: columns }, () => <Square/>)
-      );
-
-
+    
     return(
         <div className='board'>
         {board.map((row, rowIndex) => (
           <div key={rowIndex} className='row'>
             {row.map((square, colIndex) => (
-              <Square key={`${rowIndex}-${colIndex}`} />
+              <Square key={`${rowIndex}-${colIndex}`} type={square} />
             ))}
           </div>
         ))}
