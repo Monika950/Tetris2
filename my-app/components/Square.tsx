@@ -1,7 +1,6 @@
 import React from 'react';
 import './Square.css';
-import {SquareType} from './type';
-
+import {SquareType} from './types';
 
 interface SquareProps
 {

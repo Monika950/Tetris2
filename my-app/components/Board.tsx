@@ -1,6 +1,6 @@
 import './board.css'
 import Square from './Square';
-import { SquareType } from './type';
+import { SquareType } from './types';
 
 interface BoardProps
 {

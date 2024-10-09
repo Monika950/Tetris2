@@ -1,6 +1,5 @@
 import { useReducer } from "react";
-import { SquareType, Empty, Block } from "../components/type";
-import {BlockShape } from "../components/Blocks";
+import { SquareType, Empty, Block, BlockShapes} from "../components/types";
 
 interface BoardState {
   board: SquareType[][];
@@ -24,7 +23,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       case "place block":
       const { position, block } = action.payload; 
       const newBoard = [...state.board]; 
-      const blockShape = BlockShape[block]; 
+      const blockShape = BlockShapes[block]; 
 
       for (let row = 0; row < blockShape.length; row++) {
         for (let col = 0; col < blockShape[row].length; col++) {
@@ -43,7 +42,7 @@ function reducer(state: BoardState, action: Action): BoardState {
 
     const { position: movePosition, block: moveBlock } = action.payload; 
       const moveBoard = [...state.board]; 
-      const moveBlockShape = BlockShape[moveBlock]; 
+      const moveBlockShape = BlockShapes[moveBlock]; 
 
       for (let row = 0; row < moveBlockShape.length; row++) {
         for (let col = 0; col < moveBlockShape[row].length; col++) {
