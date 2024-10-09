@@ -60,28 +60,29 @@ function reducer(state: BoardState, action: Action): BoardState {
       const moveBoard = [...state.board];
       const moveShape = BlockShapes[state.currentBlock];
       const { row, column } = state.currentPosition;
-
-      const canMoveDown = (moveShape) => {
-        const nextRow = row+1;
-
-        if (nextRow >= moveBoard.length) return false;
-
-        for (let r = 0; r < moveShape.length; r++) {
-            for (let c = 0; c < moveShape[r].length; c++) {
-              if (moveShape[r][c] !== Empty.E) { 
-                const newRow = nextRow + r; 
-                const newCol = column + c; 
-        
-                if (newRow >= moveBoard.length || moveBoard[newRow][newCol] !== Empty.E) {
-                  return false; 
+    
+    const canMoveDown = (moveShape) => {
+        const lastRow=moveShape[0].length;
+    
+        if ((lastRow+row) > moveBoard.length) return false;
+        console.log(lastRow+column)
+    
+         
+            for (let c = 0; c < moveShape[0].length; c++) { 
+                if (moveBoard[0][c] !== Empty.E) { 
+                    const newCol = column + c; 
+    
+                    if (newCol >= moveBoard[lastRow+row].length || moveBoard[lastRow+row][newCol] !== Empty.E) {
+                        return false;
+                    }
                 }
-              }
             }
-        }
-        return true;
-      };
+        
+        return true; 
+    };
+    
 
-      if (!canMoveDown) {
+      if (!canMoveDown(moveShape)) {
         return {
           ...state,
           board: moveBoard,
