@@ -1,16 +1,27 @@
 import { useReducer } from "react";
-import { SquareType, Empty, Block, BlockShapes} from "../components/types";
+import { SquareType, Empty, Block } from "../components/types";
+import { BlockShapes } from "../components/Blocks";
 
 interface BoardState {
   board: SquareType[][];
+  currentBlock: Block | null;
+  currentPosition: { row: number; column: number } | null;
 }
 
-type Action = 
-  | { type: "start"}
-  | { type: "place block"; payload: { position: { row: number, column: number}; block: Block};}
-  | { type: "move down"; payload: { position: { row: number, column: number }; block: Block } };
+type Action =
+  | { type: "start" }
+  | {
+      type: "new block";
+      payload: { position: { row: number; column: number }; block: Block };
+    }
+  | { type: "move down" }
+  | { type: "move left" }
+  | { type: "move right" }
+  | { type: "rotate" };
 
-const initialBoard: SquareType[][] = Array.from({ length: 10 }, () => Array(20).fill(Empty.E));
+const initialBoard: SquareType[][] = Array.from({ length: 10 }, () =>
+  Array(20).fill(Empty.E)
+);
 
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
@@ -18,54 +29,90 @@ function reducer(state: BoardState, action: Action): BoardState {
       return {
         ...state,
         board: initialBoard,
+        currentBlock: null,
+        currentPosition: null,
       };
 
-      case "place block":
-      const { position, block } = action.payload; 
-      const newBoard = [...state.board]; 
-      const blockShape = BlockShapes[block]; 
+    case "new block":
+      const { position, block } = action.payload;
+      const newBoard = [...state.board];
+      const blockShape = BlockShapes[block];
 
       for (let row = 0; row < blockShape.length; row++) {
         for (let col = 0; col < blockShape[row].length; col++) {
           if (blockShape[row][col] !== Empty.E) {
-            newBoard[position.row + row][position.column + col] = blockShape[row][col];
+            newBoard[position.row + row][position.column + col] =
+              blockShape[row][col];
           }
         }
       }
 
       return {
         ...state,
-        board: newBoard, 
+        board: newBoard,
+        currentBlock: block,
+        currentPosition: position,
       };
 
     case "move down":
+      if (!state.currentBlock || !state.currentPosition) return state;
 
-    const { position: movePosition, block: moveBlock } = action.payload; 
-      const moveBoard = [...state.board]; 
-      const moveBlockShape = BlockShapes[moveBlock]; 
+      const moveBoard = [...state.board];
+      const moveShape = BlockShapes[state.currentBlock];
+      const { row, column } = state.currentPosition;
 
-      for (let row = 0; row < moveBlockShape.length; row++) {
-        for (let col = 0; col < moveBlockShape[row].length; col++) {
-          if (moveBlockShape[row][col] !== Empty.E) {
-            moveBoard[movePosition.row + row][movePosition.column + col] = Empty.E; // Clear current position
+      const canMoveDown = (moveShape) => {
+        const nextRow = row+1;
+
+        if (nextRow >= moveBoard.length) return false;
+
+        for (let r = 0; r < moveShape.length; r++) {
+            for (let c = 0; c < moveShape[r].length; c++) {
+              if (moveShape[r][c] !== Empty.E) { 
+                const newRow = nextRow + r; 
+                const newCol = column + c; 
+        
+                if (newRow >= moveBoard.length || moveBoard[newRow][newCol] !== Empty.E) {
+                  return false; 
+                }
+              }
+            }
+        }
+        return true;
+      };
+
+      if (!canMoveDown) {
+        return {
+          ...state,
+          board: moveBoard,
+          currentBlock: state.currentBlock,
+          currentPosition: { row, column },
+        };
+      }
+
+      for (let r = 0; r < moveShape.length; r++) {
+        for (let c = 0; c < moveShape[r].length; c++) {
+          if (moveShape[r][c] !== Empty.E) {
+            moveBoard[row + r][column + c] = Empty.E;
           }
         }
       }
 
-      const newRowPosition = movePosition.row + 1;
+      const newRowPosition = column + 1;
 
-      // Place the block in the new position
-      for (let row = 0; row < moveBlockShape.length; row++) {
-        for (let col = 0; col < moveBlockShape[row].length; col++) {
-          if (moveBlockShape[row][col] !== Empty.E) {
-            moveBoard[newRowPosition + row][movePosition.column + col] = moveBlockShape[row][col];
+      for (let r = 0; r < moveShape.length; r++) {
+        for (let c = 0; c < moveShape[r].length; c++) {
+          if (moveShape[r][c] !== Empty.E) {
+            moveBoard[row + r][newRowPosition + c] = moveShape[r][c];
           }
         }
       }
 
       return {
         ...state,
-        board: moveBoard, 
+        board: moveBoard,
+        currentBlock: state.currentBlock,
+        currentPosition: { row, column: newRowPosition },
       };
 
     default:
@@ -73,27 +120,32 @@ function reducer(state: BoardState, action: Action): BoardState {
   }
 }
 
+export default function useBoard() {
+  const [board, setBoard] = useReducer(reducer, {
+    board: initialBoard,
+    currentBlock: null,
+    currentPosition: null,
+  });
 
-export default function useBoard( )
-{
-    const [board, setBoard]= useReducer(reducer,{ board: initialBoard });
+  const startGame = () => {
+    setBoard({ type: "start" });
+  };
 
-    const startGame = () => {
-        setBoard({ type: "start" });
-    }
+  const newBlock = (
+    position: { row: number; column: number },
+    block: Block
+  ) => {
+    setBoard({ type: "new block", payload: { position, block } });
+  };
 
-    const placeBlock = (position: { row: number; column: number }, block: Block) => {
-        setBoard({ type: "place block", payload: { position, block } }); 
-      };
+  const moveDown = () => {
+    setBoard({ type: "move down" });
+  };
 
-      const moveDown = (position: { row: number; column: number }, block: Block) => {
-        setBoard({ type: "move down", payload: { position, block } });
-      };
-
-      return {
-        board: board.board,
-        startGame,
-        placeBlock,
-        moveDown,
-      };
-    }
+  return {
+    board: board.board,
+    startGame,
+    newBlock,
+    moveDown,
+  };
+}
