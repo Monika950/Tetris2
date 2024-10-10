@@ -19,13 +19,14 @@ type Action =
   | { type: "move right" }
   | { type: "rotate" };
 
-const initialBoard: SquareType[][] = Array.from({ length: 10 }, () =>
-  Array(20).fill(Empty.E)
+const initialBoard: SquareType[][] = Array.from({ length: 20 }, () =>
+  Array(10).fill(Empty.E)
 );
 
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
     case "start":
+        console.log(initialBoard.length,initialBoard[0].length);
       return {
         ...state,
         board: initialBoard,
@@ -54,67 +55,64 @@ function reducer(state: BoardState, action: Action): BoardState {
         currentPosition: position,
       };
 
-    case "move down":
-      if (!state.currentBlock || !state.currentPosition) return state;
-
-      const moveBoard = [...state.board];
-      const moveShape = BlockShapes[state.currentBlock];
-      const { row, column } = state.currentPosition;
-    
-    const canMoveDown = (moveShape) => {
-        const lastRow=moveShape[0].length;
-    
-        if ((lastRow+row) > moveBoard.length) return false;
-        console.log(lastRow+column)
-    
-         
-            for (let c = 0; c < moveShape[0].length; c++) { 
-                if (moveBoard[0][c] !== Empty.E) { 
-                    const newCol = column + c; 
-    
-                    if (newCol >= moveBoard[lastRow+row].length || moveBoard[lastRow+row][newCol] !== Empty.E) {
-                        return false;
-                    }
-                }
+      case "move down":
+        if (!state.currentBlock || !state.currentPosition) return state;
+      
+        const moveBoard = [...state.board];
+        const moveShape = BlockShapes[state.currentBlock];
+        const { row, column } = state.currentPosition;
+      
+        const canMoveDown = (moveShape) => {
+          const lastRow = moveShape.length;
+          
+          if ((row + lastRow) >= moveBoard.length) return false;
+      
+          for (let c = 0; c < moveShape[0].length; c++) {
+            if (moveShape[lastRow - 1][c] !== Empty.E) {
+              const newCol = column + c;
+              if (moveBoard[row + lastRow][newCol] !== Empty.E) {
+                return false;
+              }
             }
-        
-        return true; 
-    };
+          }
+          
+          return true;
+        };
+      
+        if (!canMoveDown(moveShape)) {
+          return {
+            ...state,
+            board: moveBoard,
+            currentBlock: state.currentBlock,
+            currentPosition: { row, column },
+          };
+        }
     
+        for (let r = 0; r < moveShape.length; r++) {
+          for (let c = 0; c < moveShape[r].length; c++) {
+            if (moveShape[r][c] !== Empty.E) {
+              moveBoard[row + r][column + c] = Empty.E;
+            }
+          }
+        }
+      
+        const newRowPosition = row + 1; 
 
-      if (!canMoveDown(moveShape)) {
+        for (let r = 0; r < moveShape.length; r++) {
+          for (let c = 0; c < moveShape[r].length; c++) {
+            if (moveShape[r][c] !== Empty.E) {
+              moveBoard[newRowPosition + r][column + c] = moveShape[r][c];
+            }
+          }
+        }
+      
         return {
           ...state,
           board: moveBoard,
           currentBlock: state.currentBlock,
-          currentPosition: { row, column },
+          currentPosition: { row: newRowPosition, column }
         };
-      }
-
-      for (let r = 0; r < moveShape.length; r++) {
-        for (let c = 0; c < moveShape[r].length; c++) {
-          if (moveShape[r][c] !== Empty.E) {
-            moveBoard[row + r][column + c] = Empty.E;
-          }
-        }
-      }
-
-      const newRowPosition = column + 1;
-
-      for (let r = 0; r < moveShape.length; r++) {
-        for (let c = 0; c < moveShape[r].length; c++) {
-          if (moveShape[r][c] !== Empty.E) {
-            moveBoard[row + r][newRowPosition + c] = moveShape[r][c];
-          }
-        }
-      }
-
-      return {
-        ...state,
-        board: moveBoard,
-        currentBlock: state.currentBlock,
-        currentPosition: { row, column: newRowPosition },
-      };
+      
 
     default:
       return state;

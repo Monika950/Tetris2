@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
     startGame();
-    newBlock({ row: 4, column: 0 }, getRandomBlock()); 
+    newBlock({ row: 0, column: 4 }, getRandomBlock()); 
   }, []);
 
   function handleKeyDown(event:React.KeyboardEvent<HTMLDivElement>) {
