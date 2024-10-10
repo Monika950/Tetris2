@@ -2,23 +2,22 @@ import './App.css'
 import { useEffect } from 'react';
 import Board from '../components/Board'
 import useBoard from '../hooks/useBoard'
-import { getRandomBlock} from '../components/Blocks';
  
 
 function App() {
 
-  const { board, startGame, newBlock, moveDown } = useBoard();
+  const { board, startGame, newBlock, moveDown, moveLeft} = useBoard();
 
   useEffect(() => {
     startGame();
-    newBlock({ row: 0, column: 4 }, getRandomBlock()); 
+    newBlock(); 
   }, []);
 
   function handleKeyDown(event:React.KeyboardEvent<HTMLDivElement>) {
     switch (event.key) {
-      // case 'ArrowLeft':
-      //   moveLeft(); 
-      //   break;
+      case 'ArrowLeft':
+        moveLeft(); 
+        break;
       // case 'ArrowRight':
       //   moveRight(); 
       //   break;

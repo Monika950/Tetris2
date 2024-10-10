@@ -1,6 +1,7 @@
-import { useReducer } from "react";
+import { useReducer, useEffect } from "react";
 import { SquareType, Empty, Block } from "../components/types";
 import { BlockShapes } from "../components/Blocks";
+import { getRandomBlock} from '../components/Blocks';
 
 interface BoardState {
   board: SquareType[][];
@@ -62,7 +63,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         const moveShape = BlockShapes[state.currentBlock];
         const { row, column } = state.currentPosition;
       
-        const canMoveDown = (moveShape) => {
+        const canMoveDown = (moveShape: SquareType[][]) => {
           const lastRow = moveShape.length;
           
           if ((row + lastRow) >= moveBoard.length) return false;
@@ -83,8 +84,9 @@ function reducer(state: BoardState, action: Action): BoardState {
           return {
             ...state,
             board: moveBoard,
-            currentBlock: state.currentBlock,
-            currentPosition: { row, column },
+            currentBlock: null,
+            currentPosition: null,
+
           };
         }
     
@@ -112,7 +114,66 @@ function reducer(state: BoardState, action: Action): BoardState {
           currentBlock: state.currentBlock,
           currentPosition: { row: newRowPosition, column }
         };
-      
+
+        case "move left":
+    if (!state.currentBlock || !state.currentPosition) return state;
+
+    const moveBoardLeft = [...state.board];
+    const moveShapeLeft = BlockShapes[state.currentBlock];
+    const { row: rowLeft, column: columnLeft } = state.currentPosition;
+
+    const canMoveLeft = (moveShape: SquareType[][]) => {
+        if ((columnLeft-1) < 0) return false; 
+
+        for (let r = 0; r < moveShape.length; r++) {
+            if (moveShape[r][columnLeft-1] !== Empty.E) {
+            const newRow = rowLeft + r - 1; 
+            if ((columnLeft-1)< 0 || moveBoardLeft[newRow][columnLeft-1] !== Empty.E) {
+                return false;
+            }
+            }
+        }
+        return true;
+        }
+
+        
+    
+
+    if (!canMoveLeft(moveShapeLeft)) {
+        return {
+        ...state,
+        board: moveBoardLeft,
+        currentBlock: state.currentBlock,
+        currentPosition: { row: rowLeft, column: columnLeft },
+        };
+  }
+
+  
+  for (let r = 0; r < moveShapeLeft.length; r++) {
+    for (let c = 0; c < moveShapeLeft[r].length; c++) {
+      if (moveShapeLeft[r][c] !== Empty.E) {
+        moveBoardLeft[rowLeft + r][columnLeft + c] = Empty.E;
+      }
+    }
+  }
+
+  const newColumnPosition = columnLeft - 1; 
+
+  for (let r = 0; r < moveShapeLeft.length; r++) {
+    for (let c = 0; c < moveShapeLeft[r].length; c++) {
+      if (moveShapeLeft[r][c] !== Empty.E) {
+        moveBoardLeft[rowLeft + r][newColumnPosition + c] = moveShapeLeft[r][c];
+      }
+    }
+  }
+
+  return {
+    ...state,
+    board: moveBoardLeft,
+    currentBlock: state.currentBlock,
+    currentPosition: { row: rowLeft, column: newColumnPosition }
+  };
+
 
     default:
       return state;
@@ -126,19 +187,34 @@ export default function useBoard() {
     currentPosition: null,
   });
 
+  useEffect(() => {
+    if (!board.currentBlock && !board.currentPosition) {
+      console.log("Block is no longer active:", board);
+      newBlock();
+    }
+  }, [board]);
+  
   const startGame = () => {
     setBoard({ type: "start" });
   };
-
-  const newBlock = (
-    position: { row: number; column: number },
-    block: Block
-  ) => {
-    setBoard({ type: "new block", payload: { position, block } });
+  
+  const newBlock = () => {
+    setBoard({
+        type: "new block",
+        payload: {
+          position: { row: 0, column: 4 },  
+          block: getRandomBlock(),          
+        }
+      });
   };
+  
 
   const moveDown = () => {
     setBoard({ type: "move down" });
+  };
+
+  const moveLeft = () => {
+    setBoard({ type: "move left" });
   };
 
   return {
@@ -146,5 +222,6 @@ export default function useBoard() {
     startGame,
     newBlock,
     moveDown,
+    moveLeft
   };
 }
