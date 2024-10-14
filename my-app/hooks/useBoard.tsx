@@ -21,7 +21,7 @@ type Action =
   | { type: "rotate" };
 
 const initialBoard: SquareType[][] = Array.from({ length: 20 }, () =>
-  Array(10).fill(Empty.E)
+  Array(10).fill(Empty.E) // function
 );
 
 function reducer(state: BoardState, action: Action): BoardState {
@@ -57,6 +57,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       };
 
       case "move down":
+        debugger
         if (!state.currentBlock || !state.currentPosition) return state;
       
         const moveBoard = [...state.board];
@@ -115,7 +116,7 @@ function reducer(state: BoardState, action: Action): BoardState {
           currentPosition: { row: newRowPosition, column }
         };
 
-        case "move left":
+        case "move left": //mestene na proverkite i mesteneto
     if (!state.currentBlock || !state.currentPosition) return state;
 
     const moveBoardLeft = [...state.board];
@@ -182,17 +183,18 @@ function reducer(state: BoardState, action: Action): BoardState {
 
 export default function useBoard() {
   const [board, setBoard] = useReducer(reducer, {
-    board: initialBoard,
+    board: [],
     currentBlock: null,
     currentPosition: null,
   });
 
   useEffect(() => {
-    if (!board.currentBlock && !board.currentPosition) {
+    debugger
+    if (board.board.length && !board.currentBlock && !board.currentPosition) {
       console.log("Block is no longer active:", board);
       newBlock();
     }
-  }, [board]);
+  }, [board.board, board.currentBlock]);
   
   const startGame = () => {
     setBoard({ type: "start" });

@@ -1,5 +1,5 @@
 import './App.css'
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import Board from '../components/Board'
 import useBoard from '../hooks/useBoard'
  
@@ -9,11 +9,12 @@ function App() {
   const { board, startGame, newBlock, moveDown, moveLeft} = useBoard();
 
   useEffect(() => {
+    debugger
     startGame();
-    newBlock(); 
+    // newBlock(); 
   }, []);
 
-  function handleKeyDown(event:React.KeyboardEvent<HTMLDivElement>) {
+  const handleKeyDown = useCallback((event:React.KeyboardEvent<HTMLDivElement>)=> {
     switch (event.key) {
       case 'ArrowLeft':
         moveLeft(); 
@@ -30,17 +31,16 @@ function App() {
       default:
         break;
     }
-  }
-
+  },[moveLeft,moveDown]);
 
   return (
     <div
-    tabIndex={0} 
-    onKeyDown={handleKeyDown} 
-    style={{ outline: 'none' }} 
-  >
+      tabIndex={0} 
+      onKeyDown={handleKeyDown} 
+      className='game' 
+    >
     <Board board={board} />
-  </div>
+  </div> // board , block i position
   )
 }
 

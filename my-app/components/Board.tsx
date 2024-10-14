@@ -18,7 +18,7 @@ function Board({ board }: BoardProps) {
     //     ))}
     //   </div>
     <div className="board">
-      {board[0].map((square, colIndex) => (
+      {board.length && board[0].map((square, colIndex) => (
         <div key={colIndex} className="column">
           {board.map((row, rowIndex) => (
             <Square
