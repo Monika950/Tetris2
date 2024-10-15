@@ -1,7 +1,7 @@
 import { useReducer, useEffect } from "react";
 import { SquareType, Empty, Block } from "../components/types";
 import { BlockShapes } from "../components/Blocks";
-import { getRandomBlock} from '../components/Blocks';
+import { getRandomBlock } from "../components/Blocks";
 
 interface BoardState {
   board: SquareType[][];
@@ -20,22 +20,58 @@ type Action =
   | { type: "move right" }
   | { type: "rotate" };
 
-const initialBoard: SquareType[][] = Array.from({ length: 20 }, () =>
-  Array(10).fill(Empty.E) // function
-);
+const getInitialBoard = (): SquareType[][] =>
+  Array.from({ length: 20 }, () => Array(10).fill(Empty.E));
+
+function canMoveDown(
+  board: SquareType[][],
+  blockShape: SquareType[][],
+  position: { row: number; column: number }
+): boolean {
+  const { row, column } = position;
+  const nextRow = row + blockShape.length;
+
+  if (nextRow >= board.length) return false;
+
+  for (let c = 0; c < blockShape[0].length; c++) {
+    if (blockShape[blockShape.length - 1][c] !== Empty.E) {
+      if (board[nextRow][column + c] !== Empty.E) return false;
+    }
+  }
+
+  return true;
+}
+
+function canMoveLeft(
+  board: SquareType[][],
+  blockShape: SquareType[][],
+  position: { row: number; column: number }
+): boolean {
+  const { row, column } = position;
+  const nextRow = row + blockShape.length;
+
+  if (nextRow >= board.length) return false;
+
+  for (let c = 0; c < blockShape[0].length; c++) {
+    if (blockShape[blockShape.length - 1][c] !== Empty.E) {
+      if (board[nextRow][column + c] !== Empty.E) return false;
+    }
+  }
+
+  return true;
+}
 
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
     case "start":
-        console.log(initialBoard.length,initialBoard[0].length);
       return {
         ...state,
-        board: initialBoard,
+        board: getInitialBoard(),
         currentBlock: null,
         currentPosition: null,
       };
 
-    case "new block":
+    case "new block": {
       const { position, block } = action.payload;
       const newBoard = [...state.board];
       const blockShape = BlockShapes[block];
@@ -55,126 +91,110 @@ function reducer(state: BoardState, action: Action): BoardState {
         currentBlock: block,
         currentPosition: position,
       };
+    }
 
-      case "move down":
-        debugger
-        if (!state.currentBlock || !state.currentPosition) return state;
-      
-        const moveBoard = [...state.board];
-        const moveShape = BlockShapes[state.currentBlock];
-        const { row, column } = state.currentPosition;
-      
-        const canMoveDown = (moveShape: SquareType[][]) => {
-          const lastRow = moveShape.length;
-          
-          if ((row + lastRow) >= moveBoard.length) return false;
-      
-          for (let c = 0; c < moveShape[0].length; c++) {
-            if (moveShape[lastRow - 1][c] !== Empty.E) {
-              const newCol = column + c;
-              if (moveBoard[row + lastRow][newCol] !== Empty.E) {
-                return false;
-              }
-            }
-          }
-          
-          return true;
-        };
-      
-        if (!canMoveDown(moveShape)) {
-          return {
-            ...state,
-            board: moveBoard,
-            currentBlock: null,
-            currentPosition: null,
+    case "move down": {
+      if (!state.currentBlock || !state.currentPosition) return state;
 
-          };
-        }
-    
-        for (let r = 0; r < moveShape.length; r++) {
-          for (let c = 0; c < moveShape[r].length; c++) {
-            if (moveShape[r][c] !== Empty.E) {
-              moveBoard[row + r][column + c] = Empty.E;
-            }
-          }
-        }
-      
-        const newRowPosition = row + 1; 
+      const moveBoard = [...state.board];
+      const moveShape = BlockShapes[state.currentBlock];
+      const { row, column } = state.currentPosition;
 
-        for (let r = 0; r < moveShape.length; r++) {
-          for (let c = 0; c < moveShape[r].length; c++) {
-            if (moveShape[r][c] !== Empty.E) {
-              moveBoard[newRowPosition + r][column + c] = moveShape[r][c];
-            }
-          }
-        }
-      
+      if (!canMoveDown(moveBoard, moveShape, { row, column })) {
+        console.log("cannot move down");
         return {
           ...state,
           board: moveBoard,
-          currentBlock: state.currentBlock,
-          currentPosition: { row: newRowPosition, column }
+          currentBlock: null,
+          currentPosition: null,
         };
+      }
 
-        case "move left": //mestene na proverkite i mesteneto
-    if (!state.currentBlock || !state.currentPosition) return state;
-
-    const moveBoardLeft = [...state.board];
-    const moveShapeLeft = BlockShapes[state.currentBlock];
-    const { row: rowLeft, column: columnLeft } = state.currentPosition;
-
-    const canMoveLeft = (moveShape: SquareType[][]) => {
-        if ((columnLeft-1) < 0) return false; 
-
-        for (let r = 0; r < moveShape.length; r++) {
-            if (moveShape[r][columnLeft-1] !== Empty.E) {
-            const newRow = rowLeft + r - 1; 
-            if ((columnLeft-1)< 0 || moveBoardLeft[newRow][columnLeft-1] !== Empty.E) {
-                return false;
-            }
-            }
+      for (let r = 0; r < moveShape.length; r++) {
+        for (let c = 0; c < moveShape[r].length; c++) {
+          if (moveShape[r][c] !== Empty.E) {
+            moveBoard[row + r][column + c] = Empty.E;
+          }
         }
-        return true;
+      }
+
+      const newRowPosition = row + 1;
+
+      for (let r = 0; r < moveShape.length; r++) {
+        for (let c = 0; c < moveShape[r].length; c++) {
+          if (moveShape[r][c] !== Empty.E) {
+            moveBoard[newRowPosition + r][column + c] = moveShape[r][c];
+          }
         }
+      }
 
-        
-    
+      return {
+        ...state,
+        board: moveBoard,
+        currentBlock: state.currentBlock,
+        currentPosition: { row: newRowPosition, column },
+      };
+    }
 
-    if (!canMoveLeft(moveShapeLeft)) {
+    case "move left": { //mestene na proverkite i mesteneto
+      if (!state.currentBlock || !state.currentPosition) return state;
+
+      const moveBoard = [...state.board];
+      const moveShape = BlockShapes[state.currentBlock];
+      const { row: row, column: column } = state.currentPosition;
+
+      // const canMoveLeft = (moveShape: SquareType[][]) => {
+      //   if (columnLeft - 1 < 0) return false;
+
+      //   for (let r = 0; r < moveShape.length; r++) {
+      //     if (moveShape[r][columnLeft - 1] !== Empty.E) {
+      //       const newRow = rowLeft + r - 1;
+      //       if (
+      //         columnLeft - 1 < 0 ||
+      //         moveBoardLeft[newRow][columnLeft - 1] !== Empty.E
+      //       ) {
+      //         return false;
+      //       }
+      //     }
+      //   }
+      //   return true;
+      // };
+
+      if (!canMoveDown(moveBoard, moveShape, { row, column })) {
         return {
+          ...state,
+          board: moveBoardLeft,
+          currentBlock: state.currentBlock,
+          currentPosition: { row: rowLeft, column: columnLeft },
+        };
+      }
+
+      for (let r = 0; r < moveShapeLeft.length; r++) {
+        for (let c = 0; c < moveShapeLeft[r].length; c++) {
+          if (moveShapeLeft[r][c] !== Empty.E) {
+            moveBoardLeft[rowLeft + r][columnLeft + c] = Empty.E;
+          }
+        }
+      }
+
+      const newColumnPosition = columnLeft - 1;
+
+      for (let r = 0; r < moveShapeLeft.length; r++) {
+        for (let c = 0; c < moveShapeLeft[r].length; c++) {
+          if (moveShapeLeft[r][c] !== Empty.E) {
+            moveBoardLeft[rowLeft + r][newColumnPosition + c] =
+              moveShapeLeft[r][c];
+          }
+        }
+      }
+
+      return {
         ...state,
         board: moveBoardLeft,
         currentBlock: state.currentBlock,
-        currentPosition: { row: rowLeft, column: columnLeft },
-        };
-  }
-
-  
-  for (let r = 0; r < moveShapeLeft.length; r++) {
-    for (let c = 0; c < moveShapeLeft[r].length; c++) {
-      if (moveShapeLeft[r][c] !== Empty.E) {
-        moveBoardLeft[rowLeft + r][columnLeft + c] = Empty.E;
-      }
+        currentPosition: { row: rowLeft, column: newColumnPosition },
+      };
     }
-  }
-
-  const newColumnPosition = columnLeft - 1; 
-
-  for (let r = 0; r < moveShapeLeft.length; r++) {
-    for (let c = 0; c < moveShapeLeft[r].length; c++) {
-      if (moveShapeLeft[r][c] !== Empty.E) {
-        moveBoardLeft[rowLeft + r][newColumnPosition + c] = moveShapeLeft[r][c];
-      }
-    }
-  }
-
-  return {
-    ...state,
-    board: moveBoardLeft,
-    currentBlock: state.currentBlock,
-    currentPosition: { row: rowLeft, column: newColumnPosition }
-  };
-
 
     default:
       return state;
@@ -189,27 +209,25 @@ export default function useBoard() {
   });
 
   useEffect(() => {
-    debugger
     if (board.board.length && !board.currentBlock && !board.currentPosition) {
       console.log("Block is no longer active:", board);
       newBlock();
     }
-  }, [board.board, board.currentBlock]);
-  
+  }, [board, board.board, board.currentBlock]);
+
   const startGame = () => {
     setBoard({ type: "start" });
   };
-  
+
   const newBlock = () => {
     setBoard({
-        type: "new block",
-        payload: {
-          position: { row: 0, column: 4 },  
-          block: getRandomBlock(),          
-        }
-      });
+      type: "new block",
+      payload: {
+        position: { row: 0, column: 4 },
+        block: getRandomBlock(),
+      },
+    });
   };
-  
 
   const moveDown = () => {
     setBoard({ type: "move down" });
@@ -224,6 +242,6 @@ export default function useBoard() {
     startGame,
     newBlock,
     moveDown,
-    moveLeft
+    moveLeft,
   };
 }
