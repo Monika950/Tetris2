@@ -48,17 +48,40 @@ function canMoveLeft(
   position: { row: number; column: number }
 ): boolean {
   const { row, column } = position;
-  const nextRow = row + blockShape.length;
+  const prevCol = column - 1;
+  if (prevCol < 0) return false;
 
-  if (nextRow >= board.length) return false;
-
-  for (let c = 0; c < blockShape[0].length; c++) {
-    if (blockShape[blockShape.length - 1][c] !== Empty.E) {
-      if (board[nextRow][column + c] !== Empty.E) return false;
+  for (let r = 0; r < blockShape.length; r++) {
+    if (blockShape[r][prevCol] !== Empty.E) {
+      if (board[row + r][prevCol] !== Empty.E) {
+        return false;
+      }
     }
   }
-
   return true;
+}
+
+function canMoveRight(
+  board: SquareType[][],
+  blockShape: SquareType[][],
+  position: { row: number; column: number }
+): boolean {
+  const { row, column } = position;
+  const nextCol = column + blockShape[0].length;
+  if (nextCol >= board[0].length) return false;
+
+  for (let r = 0; r < blockShape.length; r++) {
+    if (blockShape[r][nextCol] !== Empty.E) {
+      if (board[row + r][nextCol] !== Empty.E) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function canRotate(){
+
 }
 
 function reducer(state: BoardState, action: Action): BoardState {
@@ -110,6 +133,49 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
+      // for (let r = 0; r < moveShape.length; r++) {
+      //   for (let c = 0; c < moveShape[r].length; c++) {
+      //     if (moveShape[r][c] !== Empty.E) {
+      //       moveBoard[row + r][column + c] = Empty.E;
+      //     }
+      //   }
+      // }
+
+      // const newRowPosition = row + 1;
+
+      // for (let r = 0; r < moveShape.length; r++) {
+      //   for (let c = 0; c < moveShape[r].length; c++) {
+      //     if (moveShape[r][c] !== Empty.E) {
+      //       moveBoard[newRowPosition + r][column + c] = moveShape[r][c];
+      //     }
+      //   }
+      // }
+
+      return {
+        ...state,
+        board: moveBoard,
+        currentBlock: state.currentBlock,
+        currentPosition: { row: row+1, column },
+      };
+    }
+
+    case "move left": {
+      //mestene na proverkite i mesteneto
+      if (!state.currentBlock || !state.currentPosition) return state;
+
+      const moveBoard = [...state.board];
+      const moveShape = BlockShapes[state.currentBlock];
+      const { row: row, column: column } = state.currentPosition;
+
+      if (!canMoveLeft(moveBoard, moveShape, { row, column })) {
+        return {
+          ...state,
+          board: moveBoard,
+          currentBlock: state.currentBlock,
+          currentPosition: { row: row, column: column },
+        };
+      }
+
       for (let r = 0; r < moveShape.length; r++) {
         for (let c = 0; c < moveShape[r].length; c++) {
           if (moveShape[r][c] !== Empty.E) {
@@ -118,12 +184,12 @@ function reducer(state: BoardState, action: Action): BoardState {
         }
       }
 
-      const newRowPosition = row + 1;
+      const newColumnPosition = column - 1;
 
       for (let r = 0; r < moveShape.length; r++) {
         for (let c = 0; c < moveShape[r].length; c++) {
           if (moveShape[r][c] !== Empty.E) {
-            moveBoard[newRowPosition + r][column + c] = moveShape[r][c];
+            moveBoard[row + r][newColumnPosition + c] = moveShape[r][c];
           }
         }
       }
@@ -132,69 +198,55 @@ function reducer(state: BoardState, action: Action): BoardState {
         ...state,
         board: moveBoard,
         currentBlock: state.currentBlock,
-        currentPosition: { row: newRowPosition, column },
+        currentPosition: { row: row, column: column-1 },
       };
     }
 
-    case "move left": { //mestene na proverkite i mesteneto
+    case "move right": {
+
       if (!state.currentBlock || !state.currentPosition) return state;
-
-      const moveBoard = [...state.board];
+    
+      const moveBoard = [...state.board]; 
       const moveShape = BlockShapes[state.currentBlock];
-      const { row: row, column: column } = state.currentPosition;
+      const { row, column } = state.currentPosition;
 
-      // const canMoveLeft = (moveShape: SquareType[][]) => {
-      //   if (columnLeft - 1 < 0) return false;
-
-      //   for (let r = 0; r < moveShape.length; r++) {
-      //     if (moveShape[r][columnLeft - 1] !== Empty.E) {
-      //       const newRow = rowLeft + r - 1;
-      //       if (
-      //         columnLeft - 1 < 0 ||
-      //         moveBoardLeft[newRow][columnLeft - 1] !== Empty.E
-      //       ) {
-      //         return false;
-      //       }
-      //     }
-      //   }
-      //   return true;
-      // };
-
-      if (!canMoveDown(moveBoard, moveShape, { row, column })) {
+      if (!canMoveRight(moveBoard, moveShape, { row, column })) {
         return {
           ...state,
-          board: moveBoardLeft,
+          board: moveBoard,
           currentBlock: state.currentBlock,
-          currentPosition: { row: rowLeft, column: columnLeft },
+          currentPosition: { row, column },
         };
       }
+    
 
-      for (let r = 0; r < moveShapeLeft.length; r++) {
-        for (let c = 0; c < moveShapeLeft[r].length; c++) {
-          if (moveShapeLeft[r][c] !== Empty.E) {
-            moveBoardLeft[rowLeft + r][columnLeft + c] = Empty.E;
+      for (let r = 0; r < moveShape.length; r++) {
+        for (let c = 0; c < moveShape[r].length; c++) {
+          if (moveShape[r][c] !== Empty.E) {
+            moveBoard[row + r][column + c] = Empty.E;
           }
         }
       }
+    
 
-      const newColumnPosition = columnLeft - 1;
-
-      for (let r = 0; r < moveShapeLeft.length; r++) {
-        for (let c = 0; c < moveShapeLeft[r].length; c++) {
-          if (moveShapeLeft[r][c] !== Empty.E) {
-            moveBoardLeft[rowLeft + r][newColumnPosition + c] =
-              moveShapeLeft[r][c];
+      const newColumnPosition = column + 1;
+    
+      
+      for (let r = 0; r < moveShape.length; r++) {
+        for (let c = 0; c < moveShape[r].length; c++) {
+          if (moveShape[r][c] !== Empty.E) {
+            moveBoard[row + r][newColumnPosition + c] = moveShape[r][c];
           }
         }
       }
 
       return {
         ...state,
-        board: moveBoardLeft,
+        board: moveBoard,
         currentBlock: state.currentBlock,
-        currentPosition: { row: rowLeft, column: newColumnPosition },
+        currentPosition: { row, column: column + 1 },
       };
-    }
+    }    
 
     default:
       return state;
@@ -237,11 +289,18 @@ export default function useBoard() {
     setBoard({ type: "move left" });
   };
 
+  const moveRight = () => {
+    setBoard({ type: "move right" });
+  };
+
   return {
     board: board.board,
+    block: board.currentBlock,
+    position: board.currentPosition,
     startGame,
     newBlock,
     moveDown,
     moveLeft,
+    moveRight
   };
 }

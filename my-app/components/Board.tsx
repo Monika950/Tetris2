@@ -6,42 +6,27 @@ import { SquareType, Empty,Block } from "./types";
 
 interface BoardProps {
   board: SquareType[][];
-  block?: Block;
-  position?: { row: number; column: number };
+  block: Block | null ;
+  position: { row: number; column: number } | null;
 }
 
 function Board({ board, block, position }: BoardProps) {
   
-  if(block && position)
-  {
-  const combinedBoard = useMemo(() =>  //????
-    board.map((row, rowIndex) => {
-      return row.map((square, colIndex) => {
-        const blockRow = rowIndex - position.row;
-        const blockCol = colIndex - position.column;
-  
-        if (
-          blockRow >= 0 &&
-          blockRow < block.length &&
-          blockCol >= 0 &&
-          blockCol < block[0].length &&
-          block[blockRow][blockCol] !== Empty.E
-        ) {
-          return block[blockRow][blockCol];
-        }
-  
-        return square;
-      });
-    }),
-    [board, block, position]
-  );
-  }
+  const combinedBoard = useMemo(() => {
+    if (block && position) {
+        return board;
+});
+    }
+
+    return board;
+  }, [board, block, position]);
+    
   return (
     <>
     <div className="board">
-      {board.length && board[0].map((square, colIndex) => (
+      {combinedBoard.length && combinedBoard[0].map((square, colIndex) => (
         <div key={colIndex} className="column">
-          {board.map((_row, rowIndex) => (
+          {combinedBoard.map((_row, rowIndex) => (
             <Square
               key={`${colIndex}-${rowIndex}`}
               type={board[rowIndex][colIndex]}
@@ -52,5 +37,6 @@ function Board({ board, block, position }: BoardProps) {
     </div></>
   );
 }
+
 
 export default Board;
