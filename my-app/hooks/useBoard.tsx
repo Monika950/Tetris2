@@ -1,7 +1,6 @@
 import { useReducer, useEffect } from "react";
 import { SquareType, Empty, Block } from "../components/types";
-import { BlockShapes } from "../components/Blocks";
-import { getRandomBlock } from "../components/Blocks";
+import { BlockShapes, getRandomBlock, rotateBlock } from "../components/Blocks";
 
 interface BoardState {
   board: SquareType[][];
@@ -23,125 +22,40 @@ type Action =
 const getInitialBoard = (): SquareType[][] =>
   Array.from({ length: 20 }, () => Array(10).fill(Empty.E));
 
-function canMoveDown(
-  board: SquareType[][],
-  blockShape: SquareType[][],
-  position: { row: number; column: number }
-): boolean {
-  const { row, column } = position;
-  const nextRow = row + blockShape.length;
-
-  if (nextRow >= board.length) return false;
-
-  for (let c = 0; c < blockShape[0].length; c++) {
-    if (blockShape[blockShape.length - 1][c] !== Empty.E) {
-      if (board[nextRow][column + c] !== Empty.E) return false;
-    }
-  }
-
-  return true;
-}
-
-function canMoveLeft(
-  board: SquareType[][],
-  blockShape: SquareType[][],
-  position: { row: number; column: number }
-): boolean {
-  const { row, column } = position;
-  const prevCol = column - 1;
-  if (prevCol < 0) return false;
-
-  for (let r = 0; r < blockShape.length; r++) {
-    if (blockShape[r][prevCol] !== Empty.E) {
-      if (board[row + r][prevCol] !== Empty.E) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-function canMoveRight(
-  board: SquareType[][],
-  blockShape: SquareType[][],
-  position: { row: number; column: number }
-): boolean {
-  const { row, column } = position;
-  const nextCol = column + blockShape[0].length;
-  if (nextCol >= board[0].length) return false;
-
-  for (let r = 0; r < blockShape.length; r++) {
-    if (blockShape[r][nextCol] !== Empty.E) {
-      if (board[row + r][nextCol] !== Empty.E) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
 function canMove(
   board: SquareType[][],
   blockShape: SquareType[][],
-  position: { row: number; column: number },
-  direction: "down" | "left" | "right"
+  position: { row: number; column: number }
 ): boolean {
   const { row, column } = position;
-  const shapeHeight = blockShape.length;
-  const shapeWidth = blockShape[0].length;
-
-  let newRow;
-  let newCol;
-
-  switch (direction) {
-    case "down": {
-      newRow = row + shapeHeight;
-      newCol = column;
-      break;
-    }
-    case "left": {
-      newRow = row;
-      newCol = column - 1;
-      break;
-    }
-    case "right": {
-      newRow = row;
-      newCol = column + shapeWidth;
-      break;
-    }
-  }
 
   if (
-    newRow >= board.length ||
-    newRow < 0 ||
-    newCol >= board[0].length ||
-    newCol < 0
+    row < 0 ||
+    row + blockShape.length > board.length ||
+    column < 0 ||
+    column + blockShape[0].length > board[0].length
   ) {
     return false;
   }
 
-  if (direction === "left" || direction === "right") {
-    for (let r = 0; r < blockShape.length; r++) {
-      if (blockShape[r][newCol] !== Empty.E) {
-        if (board[row + r][newCol] !== Empty.E) {
+  for (let r = 0; r < blockShape.length; r++) {
+    for (let c = 0; c < blockShape[0].length; c++) {
+      if (blockShape[r][c] !== Empty.E) {
+        if (board[row + r][c + column] !== Empty.E) {
           return false;
         }
       }
     }
-    
-    return true;
-  } else {
-    for (let c = 0; c < blockShape[0].length; c++) {
-      if (blockShape[blockShape.length - 1][c] !== Empty.E) {
-        if (board[newRow][column + c] !== Empty.E) return false;
-      }
-    }
-    
-    return true;
   }
+
+  return true;
 }
 
-function canRotate() {}
+function canRotate(
+  board: SquareType[][],
+  blockShape: SquareType[][],
+  position: { row: number; column: number }
+): boolean {}
 
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
@@ -155,11 +69,9 @@ function reducer(state: BoardState, action: Action): BoardState {
 
     case "new block": {
       const { position, block } = action.payload;
-      //const newBoard = [...state.board];  ??
 
       return {
         ...state,
-        //board: newBoard,
         currentBlock: block,
         currentPosition: position,
       };
@@ -172,7 +84,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       const moveShape = BlockShapes[state.currentBlock];
       const { row, column } = state.currentPosition;
 
-      if (!canMove(moveBoard, moveShape, { row, column }, "down")) {
+      if (!canMove(moveBoard, moveShape, { row: row + 1, column })) {
         console.log("cannot move down");
 
         for (let r = 0; r < moveShape.length; r++) {
@@ -206,10 +118,9 @@ function reducer(state: BoardState, action: Action): BoardState {
       const moveShape = BlockShapes[state.currentBlock];
       const { row: row, column: column } = state.currentPosition;
 
-      if (!canMove(moveBoard, moveShape, { row, column }, "left")) {
+      if (!canMove(moveBoard, moveShape, { row, column: column - 1 })) {
         return {
           ...state,
-          board: moveBoard,
           currentBlock: state.currentBlock,
           currentPosition: { row: row, column: column },
         };
@@ -217,7 +128,6 @@ function reducer(state: BoardState, action: Action): BoardState {
 
       return {
         ...state,
-        board: moveBoard,
         currentBlock: state.currentBlock,
         currentPosition: { row: row, column: column - 1 },
       };
@@ -230,10 +140,9 @@ function reducer(state: BoardState, action: Action): BoardState {
       const moveShape = BlockShapes[state.currentBlock];
       const { row, column } = state.currentPosition;
 
-      if (!canMove(moveBoard, moveShape, { row, column },'right')) {
+      if (!canMove(moveBoard, moveShape, { row, column: column + 1 })) {
         return {
           ...state,
-          //board: moveBoard,
           currentBlock: state.currentBlock,
           currentPosition: { row, column },
         };
@@ -241,9 +150,15 @@ function reducer(state: BoardState, action: Action): BoardState {
 
       return {
         ...state,
-        board: moveBoard,
         currentBlock: state.currentBlock,
         currentPosition: { row, column: column + 1 },
+      };
+    }
+
+    case "rotate": {
+      return {
+        ...state,
+        currentBlock: state.currentBlock,
       };
     }
 
@@ -261,7 +176,6 @@ export default function useBoard() {
 
   useEffect(() => {
     if (board.board.length && !board.currentBlock && !board.currentPosition) {
-      console.log("Block is no longer active:", board);
       newBlock();
     }
   }, [board, board.board, board.currentBlock]);
@@ -292,6 +206,10 @@ export default function useBoard() {
     setBoard({ type: "move right" });
   };
 
+  const rotate = () => {
+    setBoard({ type: "rotate" });
+  };
+
   return {
     board: board.board,
     block: board.currentBlock,
@@ -301,5 +219,6 @@ export default function useBoard() {
     moveDown,
     moveLeft,
     moveRight,
+    rotate,
   };
 }

@@ -5,7 +5,7 @@ import useBoard from "../hooks/useBoard";
 
 
 function App() {
-  const { board, block, position, startGame, newBlock, moveDown, moveLeft, moveRight } = useBoard();
+  const { board, block, position, startGame, newBlock, moveDown, moveLeft, moveRight, rotateBlock } = useBoard();
 
   useEffect(() => {
     startGame();
@@ -20,9 +20,9 @@ function App() {
         case 'ArrowRight':
           moveRight();
           break;
-        // case 'ArrowUp':
-        //   rotateBlock();
-        //   break;
+        case 'ArrowUp':
+          rotate();
+          break;
         case "ArrowDown":
           moveDown();
           break;
