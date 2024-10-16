@@ -6,6 +6,7 @@ interface BoardState {
   board: SquareType[][];
   currentBlock: Block | null;
   currentPosition: { row: number; column: number } | null;
+  gameOver: boolean;
 }
 
 type Action =
@@ -51,12 +52,6 @@ function canMove(
   return true;
 }
 
-function canRotate(
-  board: SquareType[][],
-  blockShape: SquareType[][],
-  position: { row: number; column: number }
-): boolean {}
-
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
     case "start":
@@ -65,6 +60,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         board: getInitialBoard(),
         currentBlock: null,
         currentPosition: null,
+        gameOver: false,
       };
 
     case "new block": {
@@ -93,6 +89,16 @@ function reducer(state: BoardState, action: Action): BoardState {
               moveBoard[row + r][column + c] = moveShape[r][c];
             }
           }
+        }
+
+        if (row === 0) {
+          return {
+            ...state,
+            board: moveBoard,
+            currentBlock: null,
+            currentPosition: null,
+            gameOver: true,
+          };
         }
 
         return {
@@ -156,10 +162,23 @@ function reducer(state: BoardState, action: Action): BoardState {
     }
 
     case "rotate": {
-      return {
-        ...state,
-        currentBlock: state.currentBlock,
-      };
+      if (!state.currentBlock || !state.currentPosition) return state;
+
+      const moveBoard = [...state.board];
+      const currentShape = BlockShapes[state.currentBlock];
+      const { row, column } = state.currentPosition;
+
+      const rotatedShape = rotateBlock(currentShape);
+      if (canMove(moveBoard, currentShape, { row, column })) {
+        return {
+          ...state,
+          board: moveBoard,
+          currentBlock: state.currentBlock,
+          currentPosition: state.currentPosition,
+        };
+      }
+
+      return state;
     }
 
     default:
@@ -180,7 +199,7 @@ export default function useBoard() {
     }
   }, [board, board.board, board.currentBlock]);
 
-  const startGame = () => {
+  const startNewGame = () => {
     setBoard({ type: "start" });
   };
 
@@ -195,30 +214,38 @@ export default function useBoard() {
   };
 
   const moveDown = () => {
-    setBoard({ type: "move down" });
+    if (!board.gameOver) {
+      setBoard({ type: "move down" });
+    }
   };
 
   const moveLeft = () => {
-    setBoard({ type: "move left" });
+    if (!board.gameOver) {
+      setBoard({ type: "move left" });
+    }
   };
 
   const moveRight = () => {
-    setBoard({ type: "move right" });
+    if (!board.gameOver) {
+      setBoard({ type: "move right" });
+    }
   };
 
   const rotate = () => {
-    setBoard({ type: "rotate" });
+    if (!board.gameOver) {
+      setBoard({ type: "rotate" });
+    }
   };
-
   return {
     board: board.board,
     block: board.currentBlock,
     position: board.currentPosition,
-    startGame,
+    startNewGame,
     newBlock,
     moveDown,
     moveLeft,
     moveRight,
     rotate,
+    gameOver:board.gameOver
   };
 }

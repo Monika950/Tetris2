@@ -5,11 +5,11 @@ import useBoard from "../hooks/useBoard";
 
 
 function App() {
-  const { board, block, position, startGame, newBlock, moveDown, moveLeft, moveRight, rotateBlock } = useBoard();
+  const { board, block, position, startNewGame, newBlock, moveDown, moveLeft, moveRight, rotate, gameOver } = useBoard();
 
   useEffect(() => {
-    startGame();
-  }, []);
+      startNewGame();
+  }, [gameOver]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
