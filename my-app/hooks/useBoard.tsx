@@ -80,10 +80,68 @@ function canMoveRight(
   return true;
 }
 
+function canMove(
+  board: SquareType[][],
+  blockShape: SquareType[][],
+  position: { row: number; column: number },
+  direction: "down" | "left" | "right"
+): boolean {
+  const { row, column } = position;
+  const shapeHeight = blockShape.length;
+  const shapeWidth = blockShape[0].length;
 
-function canRotate(){
+  let newRow;
+  let newCol;
 
+  switch (direction) {
+    case "down": {
+      newRow = row + shapeHeight;
+      newCol = column;
+      break;
+    }
+    case "left": {
+      newRow = row;
+      newCol = column - 1;
+      break;
+    }
+    case "right": {
+      newRow = row;
+      newCol = column + shapeWidth;
+      break;
+    }
+  }
+
+  if (
+    newRow >= board.length ||
+    newRow < 0 ||
+    newCol >= board[0].length ||
+    newCol < 0
+  ) {
+    return false;
+  }
+
+  if (direction === "left" || direction === "right") {
+    for (let r = 0; r < blockShape.length; r++) {
+      if (blockShape[r][newCol] !== Empty.E) {
+        if (board[row + r][newCol] !== Empty.E) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
+  } else {
+    for (let c = 0; c < blockShape[0].length; c++) {
+      if (blockShape[blockShape.length - 1][c] !== Empty.E) {
+        if (board[newRow][column + c] !== Empty.E) return false;
+      }
+    }
+    
+    return true;
+  }
 }
+
+function canRotate() {}
 
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
@@ -109,12 +167,12 @@ function reducer(state: BoardState, action: Action): BoardState {
 
     case "move down": {
       if (!state.currentBlock || !state.currentPosition) return state;
-    
+
       const moveBoard = [...state.board];
       const moveShape = BlockShapes[state.currentBlock];
       const { row, column } = state.currentPosition;
-    
-      if (!canMoveDown(moveBoard, moveShape, { row, column })) {
+
+      if (!canMove(moveBoard, moveShape, { row, column }, "down")) {
         console.log("cannot move down");
 
         for (let r = 0; r < moveShape.length; r++) {
@@ -124,7 +182,7 @@ function reducer(state: BoardState, action: Action): BoardState {
             }
           }
         }
-  
+
         return {
           ...state,
           board: moveBoard,
@@ -132,7 +190,7 @@ function reducer(state: BoardState, action: Action): BoardState {
           currentPosition: null,
         };
       }
-    
+
       return {
         ...state,
         board: moveBoard,
@@ -140,7 +198,6 @@ function reducer(state: BoardState, action: Action): BoardState {
         currentPosition: { row: row + 1, column },
       };
     }
-    
 
     case "move left": {
       if (!state.currentBlock || !state.currentPosition) return state;
@@ -149,7 +206,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       const moveShape = BlockShapes[state.currentBlock];
       const { row: row, column: column } = state.currentPosition;
 
-      if (!canMoveLeft(moveBoard, moveShape, { row, column })) {
+      if (!canMove(moveBoard, moveShape, { row, column }, "left")) {
         return {
           ...state,
           board: moveBoard,
@@ -162,19 +219,18 @@ function reducer(state: BoardState, action: Action): BoardState {
         ...state,
         board: moveBoard,
         currentBlock: state.currentBlock,
-        currentPosition: { row: row, column: column-1 },
+        currentPosition: { row: row, column: column - 1 },
       };
     }
 
     case "move right": {
-
       if (!state.currentBlock || !state.currentPosition) return state;
-    
-      const moveBoard = [...state.board]; 
+
+      const moveBoard = [...state.board];
       const moveShape = BlockShapes[state.currentBlock];
       const { row, column } = state.currentPosition;
 
-      if (!canMoveRight(moveBoard, moveShape, { row, column })) {
+      if (!canMove(moveBoard, moveShape, { row, column },'right')) {
         return {
           ...state,
           //board: moveBoard,
@@ -189,7 +245,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         currentBlock: state.currentBlock,
         currentPosition: { row, column: column + 1 },
       };
-    }    
+    }
 
     default:
       return state;
@@ -244,6 +300,6 @@ export default function useBoard() {
     newBlock,
     moveDown,
     moveLeft,
-    moveRight
+    moveRight,
   };
 }
