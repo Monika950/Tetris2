@@ -57,3 +57,17 @@ export function rotateBlock(blockShape: SquareType[][]): SquareType[][] {
 
     return rotatedShape;
 }
+
+export function canClearRow(row: SquareType[]):(boolean)
+{
+   return row.every(cell => cell !== Empty.E);
+}
+
+export function clearRows(board: SquareType[][]): SquareType[][] {
+  const clearedBoard = board.filter(row => !canClearRow(row));
+  const numberOfRowsCleared = board.length - clearedBoard.length; // points in the future
+    console.log(numberOfRowsCleared);
+  const emptyRows = Array.from({ length: numberOfRowsCleared }, () => Array(board[0].length).fill(Empty.E));
+  
+  return [...emptyRows, ...clearedBoard] 
+}

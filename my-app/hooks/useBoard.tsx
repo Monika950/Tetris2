@@ -1,6 +1,6 @@
 import { useReducer, useEffect } from "react";
 import { SquareType, Empty, Block } from "../components/types";
-import { getRandomBlock, rotateBlock } from "../components/Blocks";
+import { getRandomBlock, rotateBlock, clearRows } from "../components/Blocks";
 
 interface BoardState {
   board: SquareType[][];
@@ -91,10 +91,12 @@ function reducer(state: BoardState, action: Action): BoardState {
           }
         }
 
+        const newBoard = clearRows(moveBoard);
+
         if (row === 0) {
           return {
             ...state,
-            board: moveBoard,
+            board: newBoard,
             currentBlock: null,
             currentPosition: null,
             gameOver: true,
@@ -103,7 +105,7 @@ function reducer(state: BoardState, action: Action): BoardState {
 
         return {
           ...state,
-          board: moveBoard,
+          board: newBoard,
           currentBlock: null,
           currentPosition: null,
         };
