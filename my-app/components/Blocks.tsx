@@ -30,14 +30,13 @@ export const BlockShapes: { [key in Block]: SquareType[][] } = {
     ],
 };
 
-export function getRandomBlock() {
-    const blockValues = Object.values(Block); 
-    const randomIndex = Math.floor(Math.random() * blockValues.length); 
+export function getRandomBlock(): SquareType[][] {
+    const blockValues = Object.values(Block);
+    const randomIndex = Math.floor(Math.random() * blockValues.length);
     const randomBlock = blockValues[randomIndex];
-    console.log(randomBlock);
-    
-    return randomBlock;
-}
+  
+    return BlockShapes[randomBlock]; 
+  } 
 
 export function rotateBlock(blockShape: SquareType[][]): SquareType[][] {
     const shapeHeight = blockShape.length;

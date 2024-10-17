@@ -1,12 +1,11 @@
 import "./board.css";
 import { useMemo } from "react";
 import Square from "./Square";
-import { SquareType, Empty, Block } from "./types";
-import { BlockShapes } from "./Blocks";
+import { SquareType, Empty} from "./types";
 
 interface BoardProps {
   board: SquareType[][];
-  block: Block | null;
+  block: SquareType[][] | null;
   position: { row: number; column: number } | null;
 }
 
@@ -17,7 +16,7 @@ function Board({ board, block, position }: BoardProps) {
     const boardCopy = board.map(row => [...row]);
 
     if (block && position) {
-      const shape = BlockShapes[block];
+      const shape = [...block];
       const blockHeight = shape.length;
       const blockWidth = shape[0].length;
 

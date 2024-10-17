@@ -30,7 +30,7 @@ function App() {
           break;
       }
     },
-    [moveLeft, moveDown, moveRight]
+    [moveLeft, moveDown, moveRight,rotate]
   );
 
   return (

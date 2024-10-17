@@ -1,10 +1,10 @@
 import { useReducer, useEffect } from "react";
 import { SquareType, Empty, Block } from "../components/types";
-import { BlockShapes, getRandomBlock, rotateBlock } from "../components/Blocks";
+import { getRandomBlock, rotateBlock } from "../components/Blocks";
 
 interface BoardState {
   board: SquareType[][];
-  currentBlock: Block | null;
+  currentBlock: SquareType[][] | null;
   currentPosition: { row: number; column: number } | null;
   gameOver: boolean;
 }
@@ -77,7 +77,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       if (!state.currentBlock || !state.currentPosition) return state;
 
       const moveBoard = [...state.board];
-      const moveShape = BlockShapes[state.currentBlock];
+      const moveShape = [...state.currentBlock];
       const { row, column } = state.currentPosition;
 
       if (!canMove(moveBoard, moveShape, { row: row + 1, column })) {
@@ -121,7 +121,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       if (!state.currentBlock || !state.currentPosition) return state;
 
       const moveBoard = [...state.board];
-      const moveShape = BlockShapes[state.currentBlock];
+      const moveShape = [...state.currentBlock];
       const { row: row, column: column } = state.currentPosition;
 
       if (!canMove(moveBoard, moveShape, { row, column: column - 1 })) {
@@ -143,7 +143,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       if (!state.currentBlock || !state.currentPosition) return state;
 
       const moveBoard = [...state.board];
-      const moveShape = BlockShapes[state.currentBlock];
+      const moveShape = [...state.currentBlock];
       const { row, column } = state.currentPosition;
 
       if (!canMove(moveBoard, moveShape, { row, column: column + 1 })) {
@@ -165,15 +165,15 @@ function reducer(state: BoardState, action: Action): BoardState {
       if (!state.currentBlock || !state.currentPosition) return state;
 
       const moveBoard = [...state.board];
-      const currentShape = BlockShapes[state.currentBlock];
+      const currentShape = [...state.currentBlock];
       const { row, column } = state.currentPosition;
 
       const rotatedShape = rotateBlock(currentShape);
-      if (canMove(moveBoard, currentShape, { row, column })) {
+      if (canMove(moveBoard, rotatedShape, { row, column })) {
         return {
           ...state,
           board: moveBoard,
-          currentBlock: state.currentBlock,
+          currentBlock: rotatedShape,
           currentPosition: state.currentPosition,
         };
       }
