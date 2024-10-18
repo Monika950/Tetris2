@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useMemo } from "react";
 import { SquareType, Empty} from "../components/types";
 import { getRandomBlock, rotateBlock, clearRows } from "../components/Blocks";
 
@@ -199,25 +199,27 @@ function reducer(state: BoardState, action: Action): BoardState {
   }
 }
 
+const InitialboardState = {
+  board: [],
+  currentBlock: null,
+  currentPosition: null,
+  nextBlock: null,
+  score: 0,
+  gameOver: false,
+}
 export default function useBoard() {
-  const [board, setBoard] = useReducer(reducer, {
-    board: getInitialBoard(),
-    currentBlock: null,
-    currentPosition: null,
-    nextBlock: null,
-    score: 0,
-    gameOver: false,
-  });
+  const [board, setBoard] = useReducer(reducer, InitialboardState);
 
   useEffect(() => {
+    //debugger
     if (board.board.length && !board.currentBlock && !board.currentPosition) {
       newBlock();
     } 
-  }, [board]);
+  },  [board.board, board.currentBlock]);
 
-  const startNewGame = () => {
+  const startNewGame = useMemo(() => () => {
     setBoard({ type: "start" });
-  };
+  }, [])
 
   const newBlock = () => {
     setBoard({

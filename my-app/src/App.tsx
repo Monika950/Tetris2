@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
       startNewGame();
-  }, [gameOver]);
+  }, [gameOver, startNewGame]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {

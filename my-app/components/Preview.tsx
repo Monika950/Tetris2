@@ -3,7 +3,7 @@ import { SquareType } from './types';
 import Square from './Square';
 
 interface PreviewProps {
-  shape?: SquareType[][]; 
+  shape?: SquareType[][] | null; 
 }
 
 const Preview: React.FC<PreviewProps> = ({ shape }) => {
