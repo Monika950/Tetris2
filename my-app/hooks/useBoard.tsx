@@ -199,7 +199,7 @@ function reducer(state: BoardState, action: Action): BoardState {
   }
 }
 
-const InitialboardState = {
+const InitialBoardState = {
   board: [],
   currentBlock: null,
   currentPosition: null,
@@ -207,15 +207,25 @@ const InitialboardState = {
   score: 0,
   gameOver: false,
 }
+
 export default function useBoard() {
-  const [board, setBoard] = useReducer(reducer, InitialboardState);
+  const [board, setBoard] = useReducer(reducer, InitialBoardState);
 
   useEffect(() => {
-    //debugger
+    if (!board.gameOver) {
+      const intervalId = setInterval(() => {
+        setBoard({ type: "move down" });
+      }, 1000); 
+
+      return () => clearInterval(intervalId);
+    }
+  }, [board.gameOver]);
+
+  useEffect(() => {
     if (board.board.length && !board.currentBlock && !board.currentPosition) {
       newBlock();
     } 
-  },  [board.board, board.currentBlock]);
+  },  [board.board, board.currentBlock, board.currentPosition]);
 
   const startNewGame = useMemo(() => () => {
     setBoard({ type: "start" });
@@ -232,29 +242,30 @@ export default function useBoard() {
     });
   };
 
-  const moveDown = () => {
+  const moveDown = useMemo(() => () => {
     if (!board.gameOver) {
       setBoard({ type: "move down" });
     }
-  };
+  }, [board.gameOver]);
 
-  const moveLeft = () => {
+  
+  const moveLeft = useMemo(() => () => {
     if (!board.gameOver) {
       setBoard({ type: "move left" });
     }
-  };
+  }, [board.gameOver]);
 
-  const moveRight = () => {
+  const moveRight = useMemo(() => () => {
     if (!board.gameOver) {
       setBoard({ type: "move right" });
     }
-  };
+  }, [board.gameOver]);
 
-  const rotate = () => {
+  const rotate = useMemo(() => () => {
     if (!board.gameOver) {
       setBoard({ type: "rotate" });
     }
-  };
+  }, [board.gameOver]);
 
   return {
     board: board.board,
