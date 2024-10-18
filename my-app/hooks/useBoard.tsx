@@ -1,10 +1,11 @@
 import { useReducer, useEffect } from "react";
-import { SquareType, Empty, Block } from "../components/types";
+import { SquareType, Empty} from "../components/types";
 import { getRandomBlock, rotateBlock, clearRows } from "../components/Blocks";
 
 interface BoardState {
   board: SquareType[][];
   currentBlock: SquareType[][] | null;
+  nextBlock: SquareType[][] | null;
   currentPosition: { row: number; column: number } | null;
   score: number;
   gameOver: boolean;
@@ -14,7 +15,7 @@ type Action =
   | { type: "start" }
   | {
       type: "new block";
-      payload: { position: { row: number; column: number }; block: Block };
+      payload: { block: SquareType[][]; nextBlock: SquareType[][] };
     }
   | { type: "move down" }
   | { type: "move left" }
@@ -60,18 +61,20 @@ function reducer(state: BoardState, action: Action): BoardState {
         ...state,
         board: getInitialBoard(),
         currentBlock: null,
+        nextBlock: null,
         currentPosition: null,
         gameOver: false,
         score: 0,
       };
 
     case "new block": {
-      const { position, block } = action.payload;
+      const { block, nextBlock} = action.payload;
 
       return {
         ...state,
         currentBlock: block,
-        currentPosition: position,
+        nextBlock: nextBlock,
+        currentPosition: { row: 0, column: 4 },
       };
     }
 
@@ -110,8 +113,9 @@ function reducer(state: BoardState, action: Action): BoardState {
         return {
           ...state,
           board: newBoard,
-          currentBlock: null,
-          currentPosition: null,
+          currentBlock: state.nextBlock, 
+          nextBlock: getRandomBlock(), 
+          currentPosition: { row: 0, column: 4 },
           score: newScore,
         };
       }
@@ -120,6 +124,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         ...state,
         board: moveBoard,
         currentBlock: state.currentBlock,
+        nextBlock: state.nextBlock,
         currentPosition: { row: row + 1, column },
         score: score,
       };
@@ -130,7 +135,7 @@ function reducer(state: BoardState, action: Action): BoardState {
 
       const moveBoard = [...state.board];
       const moveShape = [...state.currentBlock];
-      const { row: row, column: column } = state.currentPosition;
+      const { row, column } = state.currentPosition;
 
       if (!canMove(moveBoard, moveShape, { row, column: column - 1 })) {
         return {
@@ -196,18 +201,19 @@ function reducer(state: BoardState, action: Action): BoardState {
 
 export default function useBoard() {
   const [board, setBoard] = useReducer(reducer, {
-    board: [],
+    board: getInitialBoard(),
     currentBlock: null,
     currentPosition: null,
+    nextBlock: null,
+    score: 0,
+    gameOver: false,
   });
 
   useEffect(() => {
     if (board.board.length && !board.currentBlock && !board.currentPosition) {
       newBlock();
     } 
-  
-  }, [board, board.board, board.currentBlock]);
-  
+  }, [board]);
 
   const startNewGame = () => {
     setBoard({ type: "start" });
@@ -218,8 +224,8 @@ export default function useBoard() {
       type: "new block",
       payload: 
       {
-        position: { row: 0, column: 4 },
         block: getRandomBlock(),
+        nextBlock: getRandomBlock(), 
       },
     });
   };
@@ -247,6 +253,7 @@ export default function useBoard() {
       setBoard({ type: "rotate" });
     }
   };
+
   return {
     board: board.board,
     block: board.currentBlock,
@@ -257,7 +264,8 @@ export default function useBoard() {
     moveLeft,
     moveRight,
     rotate,
-    gameOver:board.gameOver,
-    score:board.score
+    gameOver: board.gameOver,
+    score: board.score,
+    nextBlock: board.nextBlock, 
   };
 }
