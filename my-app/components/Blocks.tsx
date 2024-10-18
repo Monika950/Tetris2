@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { SquareType, Block, Empty } from "./types";
 
 export const BlockShapes: { [key in Block]: SquareType[][] } = {
@@ -35,7 +36,7 @@ export function getRandomBlock(): SquareType[][] {
     const randomIndex = Math.floor(Math.random() * blockValues.length);
     const randomBlock = blockValues[randomIndex];
   
-    return BlockShapes[randomBlock]; 
+    return cloneDeep(BlockShapes[randomBlock]); 
   } 
 
 export function rotateBlock(blockShape: SquareType[][]): SquareType[][] {
@@ -52,9 +53,6 @@ export function rotateBlock(blockShape: SquareType[][]): SquareType[][] {
         }
     }
 
-    console.log(blockShape);
-    console.log(rotatedShape);
-
     return rotatedShape;
 }
 
@@ -63,11 +61,27 @@ export function canClearRow(row: SquareType[]):(boolean)
    return row.every(cell => cell !== Empty.E);
 }
 
-export function clearRows(board: SquareType[][]): SquareType[][] {
+export function clearRows(board: SquareType[][], score: number): { board: SquareType[][], score: number } {
   const clearedBoard = board.filter(row => !canClearRow(row));
-  const numberOfRowsCleared = board.length - clearedBoard.length; // points in the future
-    console.log(numberOfRowsCleared);
+  const numberOfRowsCleared = board.length - clearedBoard.length; 
+  switch (numberOfRowsCleared) {
+    case 1:
+      score += 20;
+      break;
+    case 2:
+      score += 50;
+      break;
+    case 3:
+      score += 100; 
+      break;
+    case 4:
+      score += 200; 
+      break;
+    default:
+      break;
+  }
+    console.log(score, 'is this score');
   const emptyRows = Array.from({ length: numberOfRowsCleared }, () => Array(board[0].length).fill(Empty.E));
   
-  return [...emptyRows, ...clearedBoard] 
+  return { board: [...emptyRows, ...clearedBoard], score }; 
 }

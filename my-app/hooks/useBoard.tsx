@@ -6,6 +6,7 @@ interface BoardState {
   board: SquareType[][];
   currentBlock: SquareType[][] | null;
   currentPosition: { row: number; column: number } | null;
+  score: number;
   gameOver: boolean;
 }
 
@@ -61,6 +62,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         currentBlock: null,
         currentPosition: null,
         gameOver: false,
+        score: 0,
       };
 
     case "new block": {
@@ -79,9 +81,9 @@ function reducer(state: BoardState, action: Action): BoardState {
       const moveBoard = [...state.board];
       const moveShape = [...state.currentBlock];
       const { row, column } = state.currentPosition;
+      const score = state.score;
 
       if (!canMove(moveBoard, moveShape, { row: row + 1, column })) {
-        console.log("cannot move down");
 
         for (let r = 0; r < moveShape.length; r++) {
           for (let c = 0; c < moveShape[r].length; c++) {
@@ -91,7 +93,8 @@ function reducer(state: BoardState, action: Action): BoardState {
           }
         }
 
-        const newBoard = clearRows(moveBoard);
+        const { board: newBoard, score: newScore } = clearRows(moveBoard, score);
+        console.log(score);
 
         if (row === 0) {
           return {
@@ -100,6 +103,7 @@ function reducer(state: BoardState, action: Action): BoardState {
             currentBlock: null,
             currentPosition: null,
             gameOver: true,
+            score: 0,
           };
         }
 
@@ -108,6 +112,7 @@ function reducer(state: BoardState, action: Action): BoardState {
           board: newBoard,
           currentBlock: null,
           currentPosition: null,
+          score: newScore,
         };
       }
 
@@ -116,6 +121,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         board: moveBoard,
         currentBlock: state.currentBlock,
         currentPosition: { row: row + 1, column },
+        score: score,
       };
     }
 
@@ -198,8 +204,10 @@ export default function useBoard() {
   useEffect(() => {
     if (board.board.length && !board.currentBlock && !board.currentPosition) {
       newBlock();
-    }
+    } 
+  
   }, [board, board.board, board.currentBlock]);
+  
 
   const startNewGame = () => {
     setBoard({ type: "start" });
@@ -208,7 +216,8 @@ export default function useBoard() {
   const newBlock = () => {
     setBoard({
       type: "new block",
-      payload: {
+      payload: 
+      {
         position: { row: 0, column: 4 },
         block: getRandomBlock(),
       },
@@ -248,6 +257,7 @@ export default function useBoard() {
     moveLeft,
     moveRight,
     rotate,
-    gameOver:board.gameOver
+    gameOver:board.gameOver,
+    score:board.score
   };
 }

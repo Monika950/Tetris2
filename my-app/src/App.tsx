@@ -1,11 +1,12 @@
 import "./App.css";
 import { useCallback, useEffect } from "react";
 import Board from "../components/Board";
+import ScoreBoard from "../components/ScoreBoard";
 import useBoard from "../hooks/useBoard";
 
 
 function App() {
-  const { board, block, position, startNewGame, newBlock, moveDown, moveLeft, moveRight, rotate, gameOver } = useBoard();
+  const { board, block, position, startNewGame, newBlock, moveDown, moveLeft, moveRight, rotate, gameOver,score } = useBoard();
 
   useEffect(() => {
       startNewGame();
@@ -36,6 +37,7 @@ function App() {
   return (
     <div tabIndex={0} onKeyDown={handleKeyDown} className="game">
       <Board board={board} block={block} position={position}/>
+      <ScoreBoard score={score}/>
     </div> 
   );
 }
