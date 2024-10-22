@@ -4,32 +4,54 @@ const fs = require('fs');
 const path = require('path');
 
 app.use(express.json());
-// app.set('view engine', 'ejs');
-// app.set('views', path.join(__dirname, 'views'));
 
 let fileDescriptor; 
 
 app.post('/file/open', (req, res) => {
-  const { fileName } = req.body;
-  
-  fs.open(fileName, 'w', (err, fd) => {
-    if (err) {
-      return res.status(500).json({ message: 'Failed to open the file', error: err });
+    const { fileName } = req.body;
+    
+    if (!fileName) {
+      return res.status(400).json({ message: 'Please provide a file name' });
     }
-    fileDescriptor = fd;
-    res.status(200).json({ message: 'File opened successfully', fileName });
+  
+    fs.open(fileName, 'w', (err, fd) => {
+      if (err) {
+        console.error('Error opening the file:', err); 
+        return res.status(500).json({ message: 'Failed to open the file', error: err.message });
+      }
+      fileDescriptor = fd; 
+      res.status(200).json({ message: 'File opened successfully', fileName });
+    });
+  })
+
+app.post('/file/write', (req, res) => {
+    const { content } = req.body;
+    
+    if (!fileDescriptor) {
+      return res.status(400).json({ message: 'File not opened yet. Please open the file first.' });
+    }
+  
+    fs.write(fileDescriptor, content, (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Failed to write to the file', error: err });
+      }
+      res.status(200).json({ message: 'Content written to the file successfully' });
+    });
   });
-});
 
-
-app.get('/', (req, res) => {
-    res.render('home');
-})
-
-app.get('/rand', (req, res) => {
-    const num = Math.floor(Math.random() * 10) + 1;
-    res.render('home', {num: num});
-})
+  app.post('/file/close', (req, res) => {
+    if (!fileDescriptor) {
+      return res.status(400).json({ message: 'No file opened to close' });
+    }
+  
+    fs.close(fileDescriptor, (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Failed to close the file', error: err });
+      }
+      fileDescriptor = null; 
+      res.status(200).json({ message: 'File closed successfully' });
+    });
+  });
 
 app.listen(3000, () => {
     console.log('listening on port 3000');
