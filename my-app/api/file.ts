@@ -15,7 +15,7 @@ export const openFile = (fileName) => {
     });
   };
 
-export const writeToFile = (fileContent) => {
+export const writeFile = (fileContent) => {
     fetch('http://localhost:3000/file/write', {
       method: 'POST',
       headers: {

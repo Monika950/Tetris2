@@ -1,6 +1,7 @@
 import { useReducer, useEffect, useMemo } from "react";
 import { SquareType, Empty} from "../components/types";
 import { getRandomBlock, rotateBlock, clearRows } from "../components/Blocks";
+import { writeFile } from "../api/file";
 
 interface BoardState {
   board: SquareType[][];
@@ -109,6 +110,8 @@ function reducer(state: BoardState, action: Action): BoardState {
             score: 0,
           };
         }
+
+        writeFile(`block stops at row: ${row}, column: ${column}`);
 
         return {
           ...state,

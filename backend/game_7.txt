@@ -1,0 +1,2 @@
+block move down
+block stops at row: 18, column: 4block stops at row: 18, column: 4
