@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 //console.dir(app)
 
 // app.use((req,res) => {
@@ -12,33 +14,12 @@ app.set('view engine', 'ejs');
 //     });
 
 app.get('/', (req, res) => {
-    res.send('home page');
+    res.render('home');
 })
 
-app.get('/r/:sub', (req, res) => {
-    const {sub} = req.params;
-    res.send(`<h1>${sub}<h1/>`);
-})
-
-app.get('/search', (req, res) => {
-    const {q} = req.query;
-    if(!q) 
-    {
-        res.send(`<h1>nothing searched/<h1/>`);
-    }
-    res.send(`<h1>${q}<h1/>`);
-})
-
-app.get('/cats', (req, res) => {
-    res.send('meow');
-})
-
-app.post('/cats', (req, res) => {
-    res.send('POSTT meow');
-})
-
-app.get('*', (req, res) => {
-    res.send('default I dont know');
+app.get('/rand', (req, res) => {
+    const num = Math.floor(Math.random() * 10) + 1;
+    res.render('home', {num: num});
 })
 
 app.listen(3000, () => {
