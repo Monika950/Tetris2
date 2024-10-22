@@ -1,17 +1,26 @@
 const express = require('express');
 const app = express();
+const fs = require('fs');
 const path = require('path');
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-//console.dir(app)
+app.use(express.json());
+// app.set('view engine', 'ejs');
+// app.set('views', path.join(__dirname, 'views'));
 
-// app.use((req,res) => {
-//     console.log('new request');
-//     //res.send("hello, this is the response");
-//     //res.send({color: 'green'});
-//     res.send("<h1>hello, this is the response</h1>");
-//     });
+let fileDescriptor; 
+
+app.post('/file/open', (req, res) => {
+  const { fileName } = req.body;
+  
+  fs.open(fileName, 'w', (err, fd) => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to open the file', error: err });
+    }
+    fileDescriptor = fd;
+    res.status(200).json({ message: 'File opened successfully', fileName });
+  });
+});
+
 
 app.get('/', (req, res) => {
     res.render('home');
