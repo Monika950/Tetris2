@@ -70,8 +70,7 @@ function reducer(state: BoardState, action: Action): BoardState {
 
     case "new block": {
       const { block, nextBlock} = action.payload;
-      
-     // writeFile(`${block}`).then();
+
       return {
         ...state,
         currentBlock: block,
@@ -99,7 +98,8 @@ function reducer(state: BoardState, action: Action): BoardState {
         }
 
         const { board: newBoard, score: newScore } = clearRows(moveBoard, score);
-        console.log(score);
+        
+        writeFile(`${row},${column}\n`).then();
 
         if (row === 0) {
           return {
@@ -111,8 +111,6 @@ function reducer(state: BoardState, action: Action): BoardState {
             score: 0,
           };
         }
-
-        writeFile(`block stops at row: ${row}, column: ${column}\n`);
 
         return {
           ...state,
@@ -149,6 +147,8 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
+      writeFile('left\n').then();
+
       return {
         ...state,
         currentBlock: state.currentBlock,
@@ -171,6 +171,8 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
+      writeFile('right\n').then();
+
       return {
         ...state,
         currentBlock: state.currentBlock,
@@ -187,6 +189,9 @@ function reducer(state: BoardState, action: Action): BoardState {
 
       const rotatedShape = rotateBlock(currentShape);
       if (canMove(moveBoard, rotatedShape, { row, column })) {
+
+        writeFile('rotate\n').then();
+
         return {
           ...state,
           board: moveBoard,
@@ -203,6 +208,7 @@ function reducer(state: BoardState, action: Action): BoardState {
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 const InitialBoardState = {
   board: [],
   currentBlock: null,

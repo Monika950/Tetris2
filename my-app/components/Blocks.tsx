@@ -1,5 +1,6 @@
 import { cloneDeep } from 'lodash';
 import { SquareType, Block, Empty } from "./types";
+import { writeFile } from '../api/file';
 
 export const BlockShapes: { [key in Block]: SquareType[][] } = {
     [Block.S]: [
@@ -35,6 +36,8 @@ export function getRandomBlock(): SquareType[][] {
     const blockValues = Object.values(Block);
     const randomIndex = Math.floor(Math.random() * blockValues.length);
     const randomBlock = blockValues[randomIndex];
+
+    writeFile(`${randomBlock},`).then();
   
     return cloneDeep(BlockShapes[randomBlock]); 
   } 

@@ -25,6 +25,7 @@ function App() {
   useEffect(() => {
     openFile().then(() => {
       startNewGame();
+      writeFile(`start\n`).then();
     });
 
     if (gameOver) {
