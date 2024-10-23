@@ -1,10 +1,6 @@
-export const openFile = (fileName) => {
-    fetch('http://localhost:3000/file/open', {
+export const openFile = () => {
+    return fetch('http://localhost:3000/file/open', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ fileName })
     })
     .then(response => response.json())
     .then(data => {
@@ -15,8 +11,8 @@ export const openFile = (fileName) => {
     });
   };
 
-export const writeFile = (fileContent) => {
-    fetch('http://localhost:3000/file/write', {
+export const writeFile = (fileContent: string) => {
+    return fetch('http://localhost:3000/file/write', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -33,7 +29,7 @@ export const writeFile = (fileContent) => {
   };
 
 export const closeFile = () => {
-    fetch('http://localhost:3000/file/close', {
+    return fetch('http://localhost:3000/file/close', {
       method: 'POST'
     })
     .then(response => response.json())

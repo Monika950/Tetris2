@@ -1,0 +1,4 @@
+block stops at row: 18, column: 4
+block stops at row: 18, column: 4
+block stops at row: 16, column: 4
+block stops at row: 16, column: 4

@@ -70,7 +70,8 @@ function reducer(state: BoardState, action: Action): BoardState {
 
     case "new block": {
       const { block, nextBlock} = action.payload;
-
+      
+     // writeFile(`${block}`).then();
       return {
         ...state,
         currentBlock: block,
@@ -111,7 +112,7 @@ function reducer(state: BoardState, action: Action): BoardState {
           };
         }
 
-        writeFile(`block stops at row: ${row}, column: ${column}`);
+        writeFile(`block stops at row: ${row}, column: ${column}\n`);
 
         return {
           ...state,

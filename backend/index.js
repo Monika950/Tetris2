@@ -7,23 +7,20 @@ const path = require('path');
 app.use(cors()); 
 app.use(express.json());
 
-let fileDescriptor; 
+let fileDescriptor = null; 
 
 app.post('/file/open', (req, res) => {
-    const { fileName } = req.body;
-    
-    if (!fileName) {
-      return res.status(400).json({ message: 'Please provide a file name' });
-    }
+  const date = new Date();
+  const fileName = `${date.getTime().toString()}.txt`; 
   
-    fs.open(fileName, 'w', (err, fd) => {
-      if (err) {
-        console.error('Error opening the file:', err); 
-        return res.status(500).json({ message: 'Failed to open the file', error: err.message });
-      }
-      fileDescriptor = fd; 
-      res.status(200).json({ message: 'File opened successfully', fileName });
-    });
+  try {
+    fileDescriptor = fs.openSync(fileName, 'w'); 
+    console.log(`File ${fileName} opened successfully with file descriptor: ${fileDescriptor}`);
+    res.status(200).json({ message: 'File opened successfully', fileName });
+  } catch (err) {
+    console.error('Error opening the file:', err);
+    res.status(500).json({ message: 'Failed to open the file', error: err.message });
+  }
   })
 
 app.post('/file/write', (req, res) => {
@@ -42,17 +39,18 @@ app.post('/file/write', (req, res) => {
   });
 
   app.post('/file/close', (req, res) => {
-    if (!fileDescriptor) {
-      return res.status(400).json({ message: 'No file opened to close' });
-    }
-  
-    fs.close(fileDescriptor, (err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Failed to close the file', error: err });
+    try {
+      if (fileDescriptor) {
+        fs.closeSync(fileDescriptor); 
+        console.log('File closed successfully.');
+        res.status(200).json({ message: 'File closed successfully' });
+      } else {
+        res.status(400).json({ message: 'No file is currently open' });
       }
-      fileDescriptor = null; 
-      res.status(200).json({ message: 'File closed successfully' });
-    });
+    } catch (err) {
+      console.error('Error closing the file:', err);
+      res.status(500).json({ message: 'Failed to close the file', error: err.message });
+    }
   });
 
 app.listen(3000, () => {
