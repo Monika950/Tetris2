@@ -23,12 +23,12 @@ function App() {
   } = useBoard();
 
   useEffect(() => {
-    openFile().then(() => {
-      startNewGame();
-      writeFile(`start\n`).then();
-    });
-
-    if (gameOver) {
+    if (!gameOver) {
+      openFile().then(() => {
+        startNewGame();
+        writeFile(`start\n`).then();
+      });
+    } else {
       writeFile(`game over\n`).then(() => {
         closeFile();
       });
