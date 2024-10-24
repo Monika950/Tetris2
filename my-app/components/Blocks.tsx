@@ -32,14 +32,14 @@ export const BlockShapes: { [key in Block]: SquareType[][] } = {
     ],
 };
 
-export function getRandomBlock(): SquareType[][] {
+export function getRandomBlock(): [Block,SquareType[][]] {
     const blockValues = Object.values(Block);
     const randomIndex = Math.floor(Math.random() * blockValues.length);
     const randomBlock = blockValues[randomIndex];
 
-    writeFile(`${randomBlock},`).then();
+    writeFile(`${randomBlock}`);
   
-    return cloneDeep(BlockShapes[randomBlock]); 
+    return [randomBlock,cloneDeep(BlockShapes[randomBlock])]; 
   } 
 
 export function rotateBlock(blockShape: SquareType[][]): SquareType[][] {
@@ -85,7 +85,13 @@ export function clearRows(board: SquareType[][], score: number): { board: Square
   }
   const emptyRows = Array.from({ length: numberOfRowsCleared }, () => Array(board[0].length).fill(Empty.E));
 
-  writeFile(`score ${score}`).then()
+  if (numberOfRowsCleared > 0) {
+    writeFile(JSON.stringify({
+      action: 'scoreUpdate',
+      score: score,
+      rowsCleared: numberOfRowsCleared,
+    }) + '\n');
+  }
   
   return { board: [...emptyRows, ...clearedBoard], score }; 
 }

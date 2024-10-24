@@ -98,8 +98,6 @@ function reducer(state: BoardState, action: Action): BoardState {
         }
 
         const { board: newBoard, score: newScore } = clearRows(moveBoard, score);
-        
-        writeFile(`${row},${column}\n`).then();
 
         if (row === 0) {
           return {
@@ -111,16 +109,24 @@ function reducer(state: BoardState, action: Action): BoardState {
             score: 0,
           };
         }
+        
+        writeFile('mB\n');
+
+        const [blockI, nextBlock] =getRandomBlock();
+        writeFile(`${blockI}\n`);
+
 
         return {
           ...state,
           board: newBoard,
           currentBlock: state.nextBlock, 
-          nextBlock: getRandomBlock(), 
+          nextBlock: nextBlock, 
           currentPosition: { row: 0, column: 4 },
           score: newScore,
         };
       }
+
+      writeFile('mD\n');
 
       return {
         ...state,
@@ -147,7 +153,8 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
-      writeFile('left\n').then();
+      writeFile('mL\n');
+      
 
       return {
         ...state,
@@ -171,7 +178,8 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
-      writeFile('right\n').then();
+      writeFile('mR\n');
+      
 
       return {
         ...state,
@@ -190,7 +198,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       const rotatedShape = rotateBlock(currentShape);
       if (canMove(moveBoard, rotatedShape, { row, column })) {
 
-        writeFile('rotate\n').then();
+        writeFile('mU\n');
 
         return {
           ...state,
@@ -242,12 +250,17 @@ export default function useBoard() {
   }, [])
 
   const newBlock = () => {
+    const [blockI1, block] =getRandomBlock();
+    const [blockI2, nextBlock] =getRandomBlock();
+
+    writeFile(`${blockI1} ${blockI2}\n`);
+
     setBoard({
       type: "new block",
       payload: 
       {
-        block: getRandomBlock(),
-        nextBlock: getRandomBlock(), 
+        block: block,
+        nextBlock: nextBlock, 
       },
     });
   };

@@ -23,17 +23,30 @@ function App() {
   } = useBoard();
 
   useEffect(() => {
-    if (!gameOver) {
-      openFile().then(() => {
+    if(board.length) return
+
+    openFile()
+      .then(() => {
+        return writeFile('start');
+      }).then(() => {
         startNewGame();
-        writeFile(`start\n`).then();
-      });
-    } else {
+      })
+  }, [startNewGame, board.length]);
+
+  useEffect(() => {
+    if(gameOver){
       writeFile(`game over\n`).then(() => {
-        closeFile();
-      });
+        return closeFile();
+      }).then(() => {
+        return openFile()
+      }).then(() => {
+        return writeFile('start');
+      }).then(() => {
+        startNewGame();
+      })
     }
-  }, [gameOver, startNewGame]);
+}, [gameOver, startNewGame]);
+
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -48,7 +61,7 @@ function App() {
           rotate();
           break;
         case "ArrowDown":
-          moveDown();
+          moveDown()
           break;
         default:
           break;
