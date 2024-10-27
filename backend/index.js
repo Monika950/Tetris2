@@ -53,6 +53,22 @@ app.post('/file/write', (req, res) => {
     }
   });
 
+  app.get('/files', (req, res) => {
+    //const directoryPath = path.join(__dirname, 'your-folder');
+    const directoryPath = __dirname;  
+  
+    fs.readdir(directoryPath, (err, files) => {
+      if (err) {
+        console.error('Error reading directory:', err);
+        return res.status(500).json({ message: 'Failed to read directory', error: err.message });
+      }
+  
+      const txtFiles = files.filter(file => path.extname(file) === '.txt');
+  
+      res.json({ files: txtFiles });
+    });
+  });
+
 app.listen(3000, () => {
     console.log('listening on port 3000');
 })

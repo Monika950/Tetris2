@@ -84,14 +84,6 @@ export function clearRows(board: SquareType[][], score: number): { board: Square
       break;
   }
   const emptyRows = Array.from({ length: numberOfRowsCleared }, () => Array(board[0].length).fill(Empty.E));
-
-  if (numberOfRowsCleared > 0) {
-    writeFile(JSON.stringify({
-      action: 'scoreUpdate',
-      score: score,
-      rowsCleared: numberOfRowsCleared,
-    }) + '\n');
-  }
   
   return { board: [...emptyRows, ...clearedBoard], score }; 
 }
