@@ -1,11 +1,11 @@
 import "./App.css";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "../components/Button";
 import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";
 import useBoard from "../hooks/useBoard";
-import { openFile, writeFile, closeFile } from "../api/file";
+import { openFile, writeFile, closeFile, getGames } from "../api/file";
 
 function App() {
   const {
@@ -23,34 +23,69 @@ function App() {
     nextBlock,
   } = useBoard();
 
-  useEffect(() => {
-    if(board.length) return
+  const [isReplaying, setIsReplaying] = useState(false);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  const [savedGames, setSavedGames] = useState<string[]>([]);
 
+  const handleStartGame = () => {
     openFile()
+      .then(() => writeFile('start\n'))
       .then(() => {
-        return writeFile('start');
-      }).then(() => {
         startNewGame();
+        setIsGameStarted(true);
+      });
+  };
+
+  const handleReplayGame = () => {
+    getGames()
+      .then((files) => {
+        setSavedGames(files); 
+        setIsReplaying(true); 
       })
-  }, [startNewGame, board.length]);
+      .catch((error) => {
+        console.error("Error fetching saved games", error);
+      });
+  };
 
   useEffect(() => {
-    if(gameOver){
-      writeFile(`game over\n`).then(() => {
-        return closeFile();
-      }).then(() => {
-        return openFile()
-      }).then(() => {
-        return writeFile('start');
-      }).then(() => {
-        startNewGame();
-      })
+    if (gameOver && isGameStarted) {
+      writeFile(`game over\n`)
+        .then(() => closeFile())
+        .then(() => {
+          setIsGameStarted(false);
+        });
     }
-}, [gameOver, startNewGame]);
+  }, [gameOver, isGameStarted]);
+
+  // useEffect(() => {
+  //   if(board.length) return
+
+  //   openFile()
+  //     .then(() => {
+  //       return writeFile('start');
+  //     }).then(() => {
+  //       startNewGame();
+  //     })
+  // }, [startNewGame, board.length]);
+
+//   useEffect(() => {
+//     if(gameOver){
+//       writeFile(`game over\n`).then(() => {
+//         return closeFile();
+//       }).then(() => {
+//         return openFile()
+//       }).then(() => {
+//         return writeFile('start');
+//       }).then(() => {
+//         startNewGame();
+//       })
+//     }
+// }, [gameOver, startNewGame]);
 
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!isGameStarted) return;
       switch (event.key) {
         case "ArrowLeft":
           moveLeft();
@@ -68,13 +103,25 @@ function App() {
           break;
       }
     },
-    [moveLeft, moveDown, moveRight, rotate]
+    [moveLeft, moveDown, moveRight, rotate,isGameStarted]
   );
 
   return (
     <div tabIndex={0} onKeyDown={handleKeyDown} className="game">
-      <Button name={'start'}/>
-      <Button name={'replay'}/>
+      <Button name="start" onClick={handleStartGame} />
+      <Button name="replay" onClick={handleReplayGame} />
+
+      {isReplaying && (
+        <div>
+          <h3>Select a saved game to replay:</h3>
+          <ul>
+            {savedGames.map((file, index) => (
+              <li key={index}>{file}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <Board board={board} block={block} position={position} />
       <ScoreBoard score={score} />
       <Preview shape={nextBlock} />
