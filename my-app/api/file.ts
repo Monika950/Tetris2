@@ -40,3 +40,43 @@ export const closeFile = () => {
       console.error('Error:', err);
     });
   };
+
+export const getGames = () => {
+  return fetch('http://localhost:3000/files', {
+    method: 'GET',
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to fetch games');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Games:', data.files);
+    return data.files; 
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+};
+
+export const readFile = (file: string) => {
+  return fetch('http://localhost:3000/file/read', {
+    method: 'GET',
+    body: file,
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to read file: ' + file);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Moves:', data.files);
+    return data.files; 
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+
+}

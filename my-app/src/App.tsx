@@ -1,11 +1,11 @@
 import "./App.css";
 import { useCallback, useEffect, useState } from "react";
-import Button from "../components/Button";
 import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";
 import useBoard from "../hooks/useBoard";
-import { openFile, writeFile, closeFile, getGames } from "../api/file";
+import { openFile, closeFile, getGames, readFile } from "../api/file";
+import PreviousGames from "../components/PreviousGames";
 
 function App() {
   const {
@@ -29,7 +29,6 @@ function App() {
 
   const handleStartGame = () => {
     openFile()
-      .then(() => writeFile('start\n'))
       .then(() => {
         startNewGame();
         setIsGameStarted(true);
@@ -40,17 +39,20 @@ function App() {
     getGames()
       .then((files) => {
         setSavedGames(files); 
-        setIsReplaying(true); 
+        setIsReplaying(isReplaying? false : true); 
       })
       .catch((error) => {
         console.error("Error fetching saved games", error);
       });
   };
 
+  const handleSelectedGame = (file:string) =>{
+      readFile(file).then (result => console.log(result));
+  };
+
   useEffect(() => {
     if (gameOver && isGameStarted) {
-      writeFile(`game over\n`)
-        .then(() => closeFile())
+      closeFile()
         .then(() => {
           setIsGameStarted(false);
         });
@@ -108,18 +110,11 @@ function App() {
 
   return (
     <div tabIndex={0} onKeyDown={handleKeyDown} className="game">
-      <Button name="start" onClick={handleStartGame} />
-      <Button name="replay" onClick={handleReplayGame} />
+      <button onClick={handleStartGame} > Start Game</button>
+      <button onClick={handleReplayGame} > Replay Game</button>
 
       {isReplaying && (
-        <div>
-          <h3>Select a saved game to replay:</h3>
-          <ul>
-            {savedGames.map((file, index) => (
-              <li key={index}>{file}</li>
-            ))}
-          </ul>
-        </div>
+        <PreviousGames savedGames={savedGames} onSelectGame={handleSelectedGame}/>
       )}
 
       <Board board={board} block={block} position={position} />
@@ -131,7 +126,5 @@ function App() {
 
 export default App;
 
-
-// все още не съм поискал бутон за начало, но няма лошо да сложиш един
 // до сега последната главна задача беше форматирането във файла за да можеш след това да направиш реплей
 // нека до бутона за начало да има и бутон за реплей. като го цъкнеш ще се вземе списък на сейвнатите файлове от бекенда, ще се покаже на юзъра, той ще си избере един и ще започне реплей на тази сесия. тъй като във файла имаш един дълъг списък от действия нека да се реплейват едно по едно през 0.5 секунди докато играта свърши

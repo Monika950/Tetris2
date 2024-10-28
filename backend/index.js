@@ -53,6 +53,30 @@ app.post('/file/write', (req, res) => {
     }
   });
 
+  app.get('/file/read', (req, res) => {
+    const fileName = content.body; 
+
+  if (!fileName) {
+    return res.status(400).json({ message: 'No file name provided' });
+  }
+
+  const filePath = path.join(__dirname, fileName);
+
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        return res.status(500).json({ message: 'Error reading file', error: err.message });
+      }
+      res.status(200).json({ content: data });
+    });
+  });
+
+  });
+
   app.get('/files', (req, res) => {
     //const directoryPath = path.join(__dirname, 'your-folder');
     const directoryPath = __dirname;  
