@@ -240,15 +240,13 @@ export default function useBoard() {
   const [board, setBoard] = useReducer(reducer, InitialBoardState);
 
   useEffect(() => {
-    if(board.pause){
-    if (!board.gameOver) {
+    if (!board.gameOver && !board.pause) {
       const intervalId = setInterval(() => {
         setBoard({ type: "move down" });
       }, 1000); 
 
       return () => clearInterval(intervalId);
     }
-  }
   }, [board.gameOver,board.pause]);
 
   useEffect(() => {
@@ -278,35 +276,35 @@ export default function useBoard() {
   };
 
   const moveDown = useMemo(() => () => {
-    if (!board.gameOver) {
+    if (!board.gameOver && !board.pause) {
       setBoard({ type: "move down" });
     }
-  }, [board.gameOver]);
+  }, [board.gameOver, board.pause]);
 
   
   const moveLeft = useMemo(() => () => {
-    if (!board.gameOver) {
+    if (!board.gameOver && !board.pause) {
       setBoard({ type: "move left" });
     }
-  }, [board.gameOver]);
+  }, [board.gameOver, board.pause]);
 
   const moveRight = useMemo(() => () => {
-    if (!board.gameOver) {
+    if (!board.gameOver && !board.pause) {
       setBoard({ type: "move right" });
     }
-  }, [board.gameOver]);
+  }, [board.gameOver, board.pause]);
 
   const rotate = useMemo(() => () => {
-    if (!board.gameOver) {
+    if (!board.gameOver && !board.pause) {
       setBoard({ type: "rotate" });
     }
-  }, [board.gameOver]);
+  }, [board.gameOver, board.pause]);
 
   const pauseGame = useMemo(() => () =>{
     if (!board.gameOver) {
       setBoard({ type: "pause" });
     }
-  }, [board.gameOver, board.pause]);
+  }, [board.gameOver]);
 
   return {
     board: board.board,

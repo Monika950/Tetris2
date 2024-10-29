@@ -110,7 +110,7 @@ function App() {
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (!isGameStarted) return;//??
-      if (pause) console.log('pause');//???
+      if (pause) return;//??
       switch (event.key) {
         case "ArrowLeft":
           moveLeft();
@@ -128,12 +128,12 @@ function App() {
           break;
       }
     },
-    [moveLeft, moveDown, moveRight, rotate,isGameStarted]
+    [moveLeft, moveDown, moveRight, rotate,isGameStarted,pause]
   );
 
   return (
     <div tabIndex={0} onKeyDown={handleKeyDown} className="game">
-      <button onClick={handleStartGame} > Start Game</button>
+      {!isGameStarted && !isReplaying && (<button onClick={handleStartGame} > Start Game</button>) }
       <button onClick={handleReplayGame} > Replay Game</button>
       <button onClick={pauseGame} > Pause</button>
 
