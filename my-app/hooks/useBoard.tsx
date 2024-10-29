@@ -109,14 +109,13 @@ function reducer(state: BoardState, action: Action): BoardState {
             score: 0,
           };
         }
-        
+        //debugger;
         writeFile('mB\n');
 
         const [blockI, nextBlock] =getRandomBlock();
-
         if(state.nextBlock)
           writeFile(`${state.nextBlock[0][1]} ${blockI}\n`);
-
+     
 
         return {
           ...state,
