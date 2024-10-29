@@ -60,7 +60,7 @@ export const getGames = () => {
   });
 };
 
-export const readFile = (file:string) => {
+export const readFile = (file: string) => {
   return fetch(`http://localhost:3000/file/read?fileName=${file}`, {
     method: 'GET',
   })
@@ -72,9 +72,14 @@ export const readFile = (file:string) => {
   })
   .then(data => {
     console.log('File content successfully retrieved:', data.content);
-    return data.content;
+    
+    const fileContentArray = data.content.split('\n');
+    console.log('File content as array:', fileContentArray);
+    
+    return fileContentArray;
   })
   .catch(error => {
-    console.error('Error reading file:', error); 
+    console.error('Error reading file:', error);
   });
 };
+

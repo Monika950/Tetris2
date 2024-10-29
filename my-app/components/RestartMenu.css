@@ -1,0 +1,78 @@
+/* RestartMenu.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  
+  .modal-content {
+    position: relative;
+    background-color: white;
+    border-radius: 0.5rem; /* Rounded corners */
+    padding: 2rem;
+    width: 100%;
+    max-width: 32rem; /* 2xl max-width */
+    height: 75vh;
+    overflow: hidden;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    color: #6b7280; /* Tailwind gray-500 */
+    font-size: 1.5rem; /* 2xl */
+    cursor: pointer;
+  }
+  
+  .close-button:hover {
+    color: #374151; /* Tailwind gray-700 */
+  }
+  
+  .heading {
+    font-size: 1.25rem; /* Tailwind text-xl */
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .subheading {
+    font-size: 1.125rem; /* Tailwind text-lg */
+    margin-bottom: 1.5rem;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  
+  .button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem; /* Tailwind rounded-lg */
+    color: white;
+    cursor: pointer;
+  }
+  
+  .button-new-game {
+    background-color: #3b82f6;
+  }
+  
+  .button-new-game:hover {
+    background-color: #2563eb; 
+  }
+  
+  .button-watch-replay {
+    background-color: #6b7280; 
+  }
+  
+  .button-watch-replay:hover {
+    background-color: #4b5563; 
+  }
+  

@@ -71,6 +71,7 @@ app.post('/file/write', (req, res) => {
         if (err) {
           return res.status(500).json({ message: 'Error reading file', error: err.message });
         }
+        console.log('File Content:', data)
         res.status(200).json({ content: data });
       });
     });

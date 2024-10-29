@@ -10,6 +10,7 @@ interface BoardState {
   currentPosition: { row: number; column: number } | null;
   score: number;
   gameOver: boolean;
+  pause: boolean;
 }
 
 type Action =
@@ -21,7 +22,8 @@ type Action =
   | { type: "move down" }
   | { type: "move left" }
   | { type: "move right" }
-  | { type: "rotate" };
+  | { type: "rotate" }
+  | { type: "pause" };
 
 const getInitialBoard = (): SquareType[][] =>
   Array.from({ length: 20 }, () => Array(10).fill(Empty.E));
@@ -57,6 +59,13 @@ function canMove(
 
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
+    case "pause":
+    {
+      return{
+        ...state,
+        pause: !state.pause,
+      };
+    };
     case "start":
       return {
         ...state,
@@ -231,6 +240,7 @@ export default function useBoard() {
   const [board, setBoard] = useReducer(reducer, InitialBoardState);
 
   useEffect(() => {
+    if(board.pause){
     if (!board.gameOver) {
       const intervalId = setInterval(() => {
         setBoard({ type: "move down" });
@@ -238,7 +248,8 @@ export default function useBoard() {
 
       return () => clearInterval(intervalId);
     }
-  }, [board.gameOver]);
+  }
+  }, [board.gameOver,board.pause]);
 
   useEffect(() => {
     if (board.board.length && !board.currentBlock && !board.currentPosition) {
@@ -291,6 +302,12 @@ export default function useBoard() {
     }
   }, [board.gameOver]);
 
+  const pauseGame = useMemo(() => () =>{
+    if (!board.gameOver) {
+      setBoard({ type: "pause" });
+    }
+  }, [board.gameOver, board.pause]);
+
   return {
     board: board.board,
     block: board.currentBlock,
@@ -303,6 +320,8 @@ export default function useBoard() {
     rotate,
     gameOver: board.gameOver,
     score: board.score,
-    nextBlock: board.nextBlock, 
+    nextBlock: board.nextBlock,
+    pauseGame,
+    pause: board.pause
   };
 }

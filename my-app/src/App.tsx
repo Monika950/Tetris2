@@ -4,6 +4,7 @@ import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";
 import useBoard from "../hooks/useBoard";
+import RestartMenu from "../components/RestartMenu";
 import { openFile, closeFile, getGames, readFile } from "../api/file";
 import PreviousGames from "../components/PreviousGames";
 
@@ -21,11 +22,14 @@ function App() {
     gameOver,
     score,
     nextBlock,
+    pauseGame,
+    pause
   } = useBoard();
 
   const [isReplaying, setIsReplaying] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [savedGames, setSavedGames] = useState<string[]>([]);
+  const [moves, setMoves] = useState([]);
 
   const handleStartGame = () => {
     openFile()
@@ -47,8 +51,26 @@ function App() {
   };
 
   const handleSelectedGame = (file:string) =>{
-      readFile(file).then (result => console.log(result));
+      readFile(file)
+      .then(result => { 
+        setMoves(result)
+      })
+      .catch(error => {
+        console.error('Error reading file:', error);
+      });
   };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (moves.length > 0) {
+        moves.forEach(move => {
+          replayMove(move);
+        });
+      } 
+      return () => clearInterval(intervalId);
+    }, 500);
+  }, [moves]);//??
+
 
   useEffect(() => {
     if (gameOver && isGameStarted) {
@@ -58,36 +80,37 @@ function App() {
         });
     }
   }, [gameOver, isGameStarted]);
+  
+  
 
-  // useEffect(() => {
-  //   if(board.length) return
+ const replayMove = (move:string) =>
+ {
+  switch (move) {
+    case "mL":
+      moveLeft();
+      break;
+    case "mR":
+      moveRight();
+      break;
+    case "mU":
+      rotate();
+      break;
+    case "mD":
+      moveDown()
+      break;
+    case "mB":
 
-  //   openFile()
-  //     .then(() => {
-  //       return writeFile('start');
-  //     }).then(() => {
-  //       startNewGame();
-  //     })
-  // }, [startNewGame, board.length]);
+      break;
+    default:
+      break;
+  }
 
-//   useEffect(() => {
-//     if(gameOver){
-//       writeFile(`game over\n`).then(() => {
-//         return closeFile();
-//       }).then(() => {
-//         return openFile()
-//       }).then(() => {
-//         return writeFile('start');
-//       }).then(() => {
-//         startNewGame();
-//       })
-//     }
-// }, [gameOver, startNewGame]);
-
+ }
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!isGameStarted) return;
+      if (!isGameStarted) return;//??
+      if (pause) console.log('pause');//???
       switch (event.key) {
         case "ArrowLeft":
           moveLeft();
@@ -112,10 +135,13 @@ function App() {
     <div tabIndex={0} onKeyDown={handleKeyDown} className="game">
       <button onClick={handleStartGame} > Start Game</button>
       <button onClick={handleReplayGame} > Replay Game</button>
+      <button onClick={pauseGame} > Pause</button>
 
       {isReplaying && (
         <PreviousGames savedGames={savedGames} onSelectGame={handleSelectedGame}/>
       )}
+
+      <RestartMenu score={score} isOpen={gameOver} onClose={()=>{}} />
 
       <Board board={board} block={block} position={position} />
       <ScoreBoard score={score} />
@@ -126,5 +152,27 @@ function App() {
 
 export default App;
 
-// до сега последната главна задача беше форматирането във файла за да можеш след това да направиш реплей
-// нека до бутона за начало да има и бутон за реплей. като го цъкнеш ще се вземе списък на сейвнатите файлове от бекенда, ще се покаже на юзъра, той ще си избере един и ще започне реплей на тази сесия. тъй като във файла имаш един дълъг списък от действия нека да се реплейват едно по едно през 0.5 секунди докато играта свърши
+
+// useEffect(() => {
+//   if(board.length) return
+//   openFile()
+//     .then(() => {
+//       return writeFile('start');
+//     }).then(() => {
+//       startNewGame();
+//     })
+// }, [startNewGame, board.length]);
+  
+  //   useEffect(() => {
+  //     if(gameOver){
+  //       writeFile(`game over\n`).then(() => {
+  //         return closeFile();
+  //       }).then(() => {
+  //         return openFile()
+  //       }).then(() => {
+  //         return writeFile('start');
+  //       }).then(() => {
+  //         startNewGame();
+  //       })
+  //     }
+  // }, [gameOver, startNewGame]);
