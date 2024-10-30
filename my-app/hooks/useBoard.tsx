@@ -1,7 +1,11 @@
-import { useReducer, useEffect, useMemo } from "react";
-import { SquareType, Empty} from "../components/types";
-import { getRandomBlock, rotateBlock, clearRows } from "../components/Blocks";
+import { useReducer, useMemo } from "react";
+import { SquareType, Empty, Block } from "../components/types";
+import { getRandomBlock, rotateBlock, clearRows, BlockShapes} from "../components/Blocks";
 import { writeFile } from "../api/file";
+
+// import { debounce } from "lodash";
+
+// const debouncedWriteFile = debounce(writeFile,0);
 
 interface BoardState {
   board: SquareType[][];
@@ -16,9 +20,9 @@ interface BoardState {
 type Action =
   | { type: "start" }
   | {
-      type: "new block";
-      payload: { block: SquareType[][]; nextBlock: SquareType[][] };
-    }
+    type: "new block";
+    payload: { block: SquareType[][]; nextBlock: SquareType[][] };
+  }
   | { type: "move down" }
   | { type: "move left" }
   | { type: "move right" }
@@ -60,12 +64,12 @@ function canMove(
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
     case "pause":
-    {
-      return{
-        ...state,
-        pause: !state.pause,
+      {
+        return {
+          ...state,
+          pause: !state.pause,
+        };
       };
-    };
     case "start":
       return {
         ...state,
@@ -78,7 +82,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       };
 
     case "new block": {
-      const { block, nextBlock} = action.payload;
+      const { block, nextBlock } = action.payload;
 
       return {
         ...state,
@@ -119,18 +123,22 @@ function reducer(state: BoardState, action: Action): BoardState {
           };
         }
         //debugger;
+        console.log("Writing file blal");
+
         writeFile('mB\n');
 
-        const [blockI, nextBlock] =getRandomBlock();
-        if(state.nextBlock)
+        const blockI = getRandomBlock();
+        const nextBlock = BlockShapes[blockI];
+        if (state.nextBlock)
           writeFile(`${state.nextBlock[0][1]} ${blockI}\n`);
-     
+
+        console.log("Writing fil22");
 
         return {
           ...state,
           board: newBoard,
-          currentBlock: state.nextBlock, 
-          nextBlock: nextBlock, 
+          currentBlock: state.nextBlock,
+          nextBlock: nextBlock,
           currentPosition: { row: 0, column: 4 },
           score: newScore,
         };
@@ -164,7 +172,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       }
 
       writeFile('mL\n');
-      
+
 
       return {
         ...state,
@@ -189,7 +197,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       }
 
       writeFile('mR\n');
-      
+
 
       return {
         ...state,
@@ -238,50 +246,35 @@ const InitialBoardState = {
 
 export default function useBoard() {
   const [board, setBoard] = useReducer(reducer, InitialBoardState);
-
-  useEffect(() => {
-    if (!board.gameOver && !board.pause) {
-      const intervalId = setInterval(() => {
-        setBoard({ type: "move down" });
-      }, 1000); 
-
-      return () => clearInterval(intervalId);
-    }
-  }, [board.gameOver,board.pause]);
-
-  useEffect(() => {
-    if (board.board.length && !board.currentBlock && !board.currentPosition) {
-      newBlock();
-    } 
-  },  [board.board, board.currentBlock, board.currentPosition]);
-
-  const startNewGame = useMemo(() => () => {
-    setBoard({ type: "start" });
-  }, [])
-
-  const newBlock = () => {
-    const [blockI1, block] =getRandomBlock();
-    const [blockI2, nextBlock] =getRandomBlock();
-
-    writeFile(`${blockI1} ${blockI2}\n`);
-
-    setBoard({
-      type: "new block",
-      payload: 
-      {
-        block: block,
-        nextBlock: nextBlock, 
-      },
-    });
-  };
-
+  
   const moveDown = useMemo(() => () => {
     if (!board.gameOver && !board.pause) {
       setBoard({ type: "move down" });
     }
   }, [board.gameOver, board.pause]);
 
-  
+  const startNewGame = useMemo(() => () => {
+    setBoard({ type: "start" });
+  }, [])
+
+  const newBlock = (blockI:Block,nextI:Block) => {
+    const block = BlockShapes[blockI];
+    const nextBlock = BlockShapes[nextI];
+
+    writeFile(`${blockI} ${nextI}\n`);
+
+    setBoard({
+      type: "new block",
+      payload:
+      {
+        block: block,
+        nextBlock: nextBlock,
+      },
+    });
+  };
+
+
+
   const moveLeft = useMemo(() => () => {
     if (!board.gameOver && !board.pause) {
       setBoard({ type: "move left" });
@@ -300,7 +293,7 @@ export default function useBoard() {
     }
   }, [board.gameOver, board.pause]);
 
-  const pauseGame = useMemo(() => () =>{
+  const pauseGame = useMemo(() => () => {
     if (!board.gameOver) {
       setBoard({ type: "pause" });
     }

@@ -7,6 +7,7 @@ import useBoard from "../hooks/useBoard";
 import RestartMenu from "../components/RestartMenu";
 import { openFile, closeFile, getGames, readFile } from "../api/file";
 import PreviousGames from "../components/PreviousGames";
+import { getRandomBlock } from "../components/Blocks";
 
 function App() {
   const {
@@ -50,7 +51,7 @@ function App() {
       });
   };
 
-  const handleSelectedGame = (file:string) =>{
+  const handleSelectedGame = useCallback((file:string) =>{
       readFile(file)
       .then(result => { 
         setMoves(result)
@@ -58,18 +59,22 @@ function App() {
       .catch(error => {
         console.error('Error reading file:', error);
       });
-  };
+  },[]);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (moves.length > 0) {
-        moves.forEach(move => {
-          replayMove(move);
-        });
-      } 
-      return () => clearInterval(intervalId);
-    }, 500);
-  }, [moves]);//??
+  useEffect(() =>{
+
+  },[handleSelectedGame]);
+
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     if (moves.length > 0) {
+  //       moves.forEach(move => {
+  //         replayMove(move);
+  //       });
+  //     } 
+  //     return () => clearInterval(intervalId);
+  //   }, 500);
+  // }, [moves]);//??
 
 
   useEffect(() => {
@@ -80,6 +85,21 @@ function App() {
         });
     }
   }, [gameOver, isGameStarted]);
+
+  useEffect(() => {
+    if (board.length && !block && !position) {
+      newBlock(getRandomBlock(),getRandomBlock());
+    }
+  }, [board, block, position,newBlock]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      moveDown();
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+
+}, [moveDown] );
   
   
 
@@ -141,7 +161,7 @@ function App() {
         <PreviousGames savedGames={savedGames} onSelectGame={handleSelectedGame}/>
       )}
 
-      <RestartMenu score={score} isOpen={gameOver} onClose={()=>{}} />
+      <RestartMenu score={score} isOpen={(gameOver || pause)} onClose={()=>{}} gameOver={gameOver} pause={pause} />
 
       <Board board={board} block={block} position={position} />
       <ScoreBoard score={score} />

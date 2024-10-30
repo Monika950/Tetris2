@@ -1,13 +1,15 @@
-import  React, { FC } from "react";
+import React, { FC } from "react";
 import "./RestartMenu.css";
 
 interface PopupProps {
   score: number;
   isOpen: boolean;
   onClose: () => void;
+  gameOver: boolean;
+  pause: boolean;
 }
 
-const RestartMenu: FC<PopupProps> = ({ score, isOpen, onClose }) => {
+const RestartMenu: FC<PopupProps> = ({ score, isOpen, onClose, gameOver, pause }) => {
   if (!isOpen) return null;
 
   return (
@@ -16,7 +18,8 @@ const RestartMenu: FC<PopupProps> = ({ score, isOpen, onClose }) => {
         <button className="close-button" onClick={onClose} aria-label="Close">
           ✕
         </button>
-        <h2 className="heading">Game Over</h2>
+        {gameOver && <h2 className="heading">Game Over</h2>}
+        {pause && <h2 className="heading">Paused</h2>}
         <h3 className="subheading">Your score: {score}</h3>
 
         <div className="button-group">

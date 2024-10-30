@@ -34,7 +34,7 @@ app.post('/file/write', (req, res) => {
       if (err) {
         return res.status(500).json({ message: 'Failed to write to the file', error: err });
       }
-      res.status(200).json({ message: 'Content written to the file successfully' });
+      res.status(200).json({ message: 'Content written to the file successfully bla' });
     });
   });
 
