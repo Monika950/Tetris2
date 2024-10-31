@@ -1,7 +1,8 @@
 import "./App.css";
 import { useCallback, useState } from "react";
 import PlayerGame from "../components/PlayerGame";
-import { openFile, closeFile, getGames, readFile } from "../api/file";
+import ReplayGame from "../components/ReplayGame";
+import { getGames, readFile } from "../api/file";
 import PreviousGames from "../components/PreviousGames";
 
 
@@ -9,6 +10,7 @@ function App() {
    const [isReplaying, setIsReplaying] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [savedGames, setSavedGames] = useState<string[]>([]);
+  const [moves, setMoves] = useState([]);
   
   const handleStartGame = () => {
     
@@ -16,9 +18,16 @@ function App() {
     
   };
 
-  const handleSelectedGame = () => {
-    setIsReplaying(true);
-  };
+  const handleSelectedGame = useCallback((file:string) =>{
+    readFile(file)
+    .then(result => { 
+      setMoves(result)
+    })
+    .catch(error => {
+      console.error('Error reading file:', error);
+    });
+    setIsReplaying(false);
+},[]);
 
   const handleReplayGame = () => {
     getGames()
@@ -42,6 +51,10 @@ function App() {
   
       {isReplaying && (
         <PreviousGames savedGames={savedGames} onSelectGame={handleSelectedGame} />
+      )}
+
+{moves.length > 0 && (
+        <ReplayGame moves={moves}/>
       )}
   
       {isGameStarted && (
