@@ -1,7 +1,7 @@
 import { useReducer, useMemo } from "react";
 import { SquareType, Empty, Block } from "../components/types";
 import { getRandomBlock, rotateBlock, clearRows, BlockShapes} from "../components/Blocks";
-import { writeFile } from "../api/file";
+//import { writeFile } from "../api/file";
 
 // import { debounce } from "lodash";
 
@@ -122,17 +122,13 @@ function reducer(state: BoardState, action: Action): BoardState {
             score: 0,
           };
         }
-        //debugger;
-        console.log("Writing file blal");
 
-        writeFile('mB\n');
+        //writeFile('mB\n');
 
         const blockI = getRandomBlock();
         const nextBlock = BlockShapes[blockI];
-        if (state.nextBlock)
-          writeFile(`${state.nextBlock[0][1]} ${blockI}\n`);
-
-        console.log("Writing fil22");
+        // if (state.nextBlock)
+        //   writeFile(`${state.nextBlock[0][1]} ${blockI}\n`);
 
         return {
           ...state,
@@ -144,7 +140,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
-      writeFile('mD\n');
+      // writeFile('mD\n');
 
       return {
         ...state,
@@ -171,7 +167,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
-      writeFile('mL\n');
+      //writeFile('mL\n');
 
 
       return {
@@ -196,7 +192,7 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
-      writeFile('mR\n');
+      //writeFile('mR\n');
 
 
       return {
@@ -216,7 +212,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       const rotatedShape = rotateBlock(currentShape);
       if (canMove(moveBoard, rotatedShape, { row, column })) {
 
-        writeFile('mU\n');
+        // writeFile('mU\n');
 
         return {
           ...state,
@@ -263,7 +259,7 @@ export default function useBoard() {
     const block = BlockShapes[blockI];
     const nextBlock = BlockShapes[nextI];
 
-    writeFile(`${blockI} ${nextI}\n`);
+    // writeFile(`${blockI} ${nextI}\n`);
 
     setBoard({
       type: "new block",

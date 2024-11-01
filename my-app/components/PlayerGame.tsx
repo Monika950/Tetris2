@@ -6,6 +6,7 @@ import useBoard from "../hooks/useBoard";
 import RestartMenu from "../components/RestartMenu";
 import { openFile, closeFile } from "../api/file";
 import { getRandomBlock } from "../components/Blocks";
+import { writeFile } from "../api/file";
 
 function PlayerGame() {
   const {
@@ -68,15 +69,20 @@ function PlayerGame() {
       switch (event.key) {
         case "ArrowLeft":
           moveLeft();
+          writeFile('mL\n');
           break;
         case "ArrowRight":
           moveRight();
+          writeFile('mR\n');
           break;
         case "ArrowUp":
           rotate();
+          writeFile('mU\n');
           break;
         case "ArrowDown":
           moveDown();
+          
+          writeFile('mD\n');
           break;
         default:
           break;
