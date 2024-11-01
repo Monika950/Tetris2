@@ -254,10 +254,12 @@ export default function useBoard() {
   }, [board.gameOver, board.pause]);
 
   const startNewGame = useMemo(() => () => {
+    console.log('start new game');
     setBoard({ type: "start" });
   }, [])
 
   const newBlock = (blockI:Block,nextI:Block) => {
+    console.log('new block');
     const block = BlockShapes[blockI];
     const nextBlock = BlockShapes[nextI];
 

@@ -27,13 +27,16 @@ function PlayerGame() {
 
   const [isGameStarted, setIsGameStarted] = useState(false);
 
-  const handleStartGame = () => {
-    openFile()
-      .then(() => {
-        startNewGame();
-        setIsGameStarted(true);
-      });
-  };
+  useEffect(() => {
+    if (!isGameStarted) {
+      openFile()
+        .then(() => {
+          startNewGame();
+          setIsGameStarted(true);
+        })
+        .catch(error => console.error("Error opening file:", error));
+    }
+  }, [isGameStarted, startNewGame]);
 
   useEffect(() => {
     if (gameOver && isGameStarted) {
@@ -88,10 +91,6 @@ function PlayerGame() {
 
   return (
     <div tabIndex={0} onKeyDown={handleKeyDown} className="game">
-      {!isGameStarted && (
-        <button onClick={handleStartGame}>Start Game</button>
-      )}
-      
       <button onClick={pauseGame}>{pause ? "Resume" : "Pause"}</button>
 
       <RestartMenu

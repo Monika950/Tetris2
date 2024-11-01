@@ -43,17 +43,17 @@ function App() {
  
   return (
     <div tabIndex={0}>
-      {!isGameStarted && !isReplaying && (
+      {!isGameStarted && (
+        <>
         <button onClick={handleStartGame}>Start Game</button>
+        <button onClick={handleReplayGame}>Replay Game</button></>
       )}
-      <button onClick={handleReplayGame}>Replay Game</button>
-      
   
       {isReplaying && (
         <PreviousGames savedGames={savedGames} onSelectGame={handleSelectedGame} />
       )}
 
-{moves.length > 0 && (
+      {moves.length > 0 && (
         <ReplayGame moves={moves}/>
       )}
   
@@ -67,27 +67,3 @@ function App() {
 
 export default App;
 
-
-// useEffect(() => {
-//   if(board.length) return
-//   openFile()
-//     .then(() => {
-//       return writeFile('start');
-//     }).then(() => {
-//       startNewGame();
-//     })
-// }, [startNewGame, board.length]);
-  
-  //   useEffect(() => {
-  //     if(gameOver){
-  //       writeFile(`game over\n`).then(() => {
-  //         return closeFile();
-  //       }).then(() => {
-  //         return openFile()
-  //       }).then(() => {
-  //         return writeFile('start');
-  //       }).then(() => {
-  //         startNewGame();
-  //       })
-  //     }
-  // }, [gameOver, startNewGame]);
