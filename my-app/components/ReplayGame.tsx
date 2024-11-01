@@ -3,12 +3,10 @@ import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";
 import useBoard from "../hooks/useBoard";
+import { getGames, readFile } from "../api/file";
+import PreviousGames from "../components/PreviousGames";
 
-interface ReplayProps {
-  moves: string[];
-}
-
-function ReplayGame({ moves }: ReplayProps) {
+function ReplayGame() {
   const {
     board,
     block,
@@ -28,6 +26,31 @@ function ReplayGame({ moves }: ReplayProps) {
 
   const [isReplaying, setIsReplaying] = useState(false);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(0);
+
+  const [savedGames, setSavedGames] = useState<string[]>([]);
+  const [moves, setMoves] = useState([]);
+
+  const handleReplayGame = () => {
+    getGames()
+      .then((files) => {
+        setSavedGames(files); 
+        setIsReplaying(isReplaying? false : true); 
+      })
+      .catch((error) => {
+        console.error("Error fetching saved games", error);
+      });
+  };
+
+  const handleSelectedGame = useCallback((file:string) =>{
+    readFile(file)
+    .then(result => { 
+      setMoves(result)
+    })
+    .catch(error => {
+      console.error('Error reading file:', error);
+    });
+    setIsReplaying(false);
+},[]);
 
   useEffect(() => {
     const initializeReplay = async () => {
@@ -88,6 +111,9 @@ function ReplayGame({ moves }: ReplayProps) {
 
   return (
     <div tabIndex={0} className="game">
+    { (
+        <PreviousGames savedGames={savedGames} onSelectGame={handleSelectedGame} />
+      )}
       <Board board={board} block={block} position={position} />
       <ScoreBoard score={score} />
       <Preview shape={nextBlock} />

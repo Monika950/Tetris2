@@ -69,20 +69,20 @@ function PlayerGame() {
       switch (event.key) {
         case "ArrowLeft":
           moveLeft();
-          writeFile('mL\n');
+        //   writeFile('mL\n');
           break;
         case "ArrowRight":
           moveRight();
-          writeFile('mR\n');
+        //   writeFile('mR\n');
           break;
         case "ArrowUp":
           rotate();
-          writeFile('mU\n');
+        //   writeFile('mU\n');
           break;
         case "ArrowDown":
           moveDown();
-          
-          writeFile('mD\n');
+
+        //   writeFile('mD\n');
           break;
         default:
           break;
