@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";
@@ -27,6 +27,7 @@ function PlayerGame() {
   } = useBoard();
 
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const currentBlockRef = useRef(block);
 
   useEffect(() => {
     if (!isGameStarted) {
@@ -50,7 +51,16 @@ function PlayerGame() {
 
   useEffect(() => {
     if (board.length && !block && !position) {
-      newBlock(getRandomBlock(), getRandomBlock());
+    //if (board.length && block && currentBlockRef.current !== block){
+      const currentBlock = getRandomBlock();
+      const nextBlock = getRandomBlock();
+       
+      //writeFile(`mB\n`);
+      
+      writeFile(`${currentBlock} ${nextBlock}\n`);
+
+      newBlock(currentBlock, nextBlock);
+      currentBlockRef.current = currentBlock;
     }
   }, [board, block, position, newBlock]);
 
@@ -58,6 +68,7 @@ function PlayerGame() {
     if (isGameStarted && !pause) {
       const intervalId = setInterval(() => {
         moveDown();
+        writeFile('mD\n');
       }, 1000);
       return () => clearInterval(intervalId);
     }
@@ -69,20 +80,19 @@ function PlayerGame() {
       switch (event.key) {
         case "ArrowLeft":
           moveLeft();
-        //   writeFile('mL\n');
+          writeFile('mL\n');
           break;
         case "ArrowRight":
           moveRight();
-        //   writeFile('mR\n');
+          writeFile('mR\n');
           break;
         case "ArrowUp":
           rotate();
-        //   writeFile('mU\n');
+          writeFile('mU\n');
           break;
         case "ArrowDown":
           moveDown();
-
-        //   writeFile('mD\n');
+          writeFile('mD\n');
           break;
         default:
           break;
