@@ -311,6 +311,6 @@ export default function useBoard() {
     score: board.score,
     nextBlock: board.nextBlock,
     pauseGame,
-    pause: board.pause
+    pause: board.pause,
   };
 }

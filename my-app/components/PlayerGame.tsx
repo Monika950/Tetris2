@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";
@@ -23,11 +23,12 @@ function PlayerGame() {
     score,
     nextBlock,
     pauseGame,
-    pause
+    pause,
   } = useBoard();
 
   const [isGameStarted, setIsGameStarted] = useState(false);
-  const currentBlockRef = useRef(block);
+//   const currentBlockRef = useRef(block);
+//   const prevPositionRef = useRef(position.column);
 
   useEffect(() => {
     if (!isGameStarted) {
@@ -51,16 +52,15 @@ function PlayerGame() {
 
   useEffect(() => {
     if (board.length && !block && !position) {
-    //if (board.length && block && currentBlockRef.current !== block){
+    
       const currentBlock = getRandomBlock();
       const nextBlock = getRandomBlock();
-       
-      //writeFile(`mB\n`);
       
       writeFile(`${currentBlock} ${nextBlock}\n`);
 
       newBlock(currentBlock, nextBlock);
-      currentBlockRef.current = currentBlock;
+    //   currentBlockRef.current = currentBlock;
+    //   prevPositionRef.current = position.column;
     }
   }, [board, block, position, newBlock]);
 
@@ -68,37 +68,43 @@ function PlayerGame() {
     if (isGameStarted && !pause) {
       const intervalId = setInterval(() => {
         moveDown();
+        // prevPositionRef.current = position.column;
         writeFile('mD\n');
       }, 1000);
       return () => clearInterval(intervalId);
     }
-  }, [moveDown, isGameStarted, pause]);
+  }, [moveDown, isGameStarted, pause, position]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (!isGameStarted || pause) return;
+
       switch (event.key) {
-        case "ArrowLeft":
-          moveLeft();
-          writeFile('mL\n');
-          break;
+          case "ArrowLeft":
+            moveLeft(); 
+            // if(prevPositionRef.current !== position.column)
+                writeFile("mL\n");
+            break;
         case "ArrowRight":
-          moveRight();
-          writeFile('mR\n');
+            moveRight();
+            // if(prevPositionRef.current !== position.column)
+                writeFile("mR\n");
           break;
         case "ArrowUp":
-          rotate();
-          writeFile('mU\n');
+            rotate();
+            writeFile("mU\n");
           break;
         case "ArrowDown":
+          writeFile("mD\n");
           moveDown();
-          writeFile('mD\n');
+        //   if(currentBlockRef.current !== block)
+        //     writeFile("mB\n");
           break;
         default:
           break;
       }
     },
-    [moveLeft, moveDown, moveRight, rotate, isGameStarted, pause]
+    [isGameStarted, pause, moveLeft, moveRight, rotate, moveDown]
   );
 
   const handleCloseMenu = () => {
