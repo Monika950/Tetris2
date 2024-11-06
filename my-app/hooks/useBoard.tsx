@@ -32,34 +32,34 @@ type Action =
 const getInitialBoard = (): SquareType[][] =>
   Array.from({ length: 20 }, () => Array(10).fill(Empty.E));
 
-function canMove(
-  board: SquareType[][],
-  blockShape: SquareType[][],
-  position: { row: number; column: number }
-): boolean {
-  const { row, column } = position;
+// function canMove(
+//   board: SquareType[][],
+//   blockShape: SquareType[][],
+//   position: { row: number; column: number }
+// ): boolean {
+//   const { row, column } = position;
 
-  if (
-    row < 0 ||
-    row + blockShape.length > board.length ||
-    column < 0 ||
-    column + blockShape[0].length > board[0].length
-  ) {
-    return false;
-  }
+//   if (
+//     row < 0 ||
+//     row + blockShape.length > board.length ||
+//     column < 0 ||
+//     column + blockShape[0].length > board[0].length
+//   ) {
+//     return false;
+//   }
 
-  for (let r = 0; r < blockShape.length; r++) {
-    for (let c = 0; c < blockShape[0].length; c++) {
-      if (blockShape[r][c] !== Empty.E) {
-        if (board[row + r][c + column] !== Empty.E) {
-          return false;
-        }
-      }
-    }
-  }
+//   for (let r = 0; r < blockShape.length; r++) {
+//     for (let c = 0; c < blockShape[0].length; c++) {
+//       if (blockShape[r][c] !== Empty.E) {
+//         if (board[row + r][c + column] !== Empty.E) {
+//           return false;
+//         }
+//       }
+//     }
+//   }
 
-  return true;
-}
+//   return true;
+// }
 
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
@@ -100,7 +100,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       const { row, column } = state.currentPosition;
       const score = state.score;
 
-      if (!canMove(moveBoard, moveShape, { row: row + 1, column })) {
+      // if (!canMove(moveBoard, moveShape, { row: row + 1, column })) {
 
         for (let r = 0; r < moveShape.length; r++) {
           for (let c = 0; c < moveShape[r].length; c++) {
@@ -138,34 +138,34 @@ function reducer(state: BoardState, action: Action): BoardState {
           currentPosition: { row: 0, column: 4 },
           score: newScore,
         };
-      }
+      // }
 
       // writeFile('mD\n');
 
-      return {
-        ...state,
-        board: moveBoard,
-        currentBlock: state.currentBlock,
-        nextBlock: state.nextBlock,
-        currentPosition: { row: row + 1, column },
-        score: score,
-      };
+      // return {
+      //   ...state,
+      //   board: moveBoard,
+      //   currentBlock: state.currentBlock,
+      //   nextBlock: state.nextBlock,
+      //   currentPosition: { row: row + 1, column },
+      //   score: score,
+      // };
     }
 
     case "move left": {
       if (!state.currentBlock || !state.currentPosition) return state;
 
-      const moveBoard = [...state.board];
-      const moveShape = [...state.currentBlock];
+      // const moveBoard = [...state.board];
+      // const moveShape = [...state.currentBlock];
       const { row, column } = state.currentPosition;
 
-      if (!canMove(moveBoard, moveShape, { row, column: column - 1 })) {
-        return {
-          ...state,
-          currentBlock: state.currentBlock,
-          currentPosition: { row: row, column: column },
-        };
-      }
+      // if (!canMove(moveBoard, moveShape, { row, column: column - 1 })) {
+      //   return {
+      //     ...state,
+      //     currentBlock: state.currentBlock,
+      //     currentPosition: { row: row, column: column },
+      //   };
+      // }
 
       //writeFile('mL\n');
 
@@ -180,17 +180,17 @@ function reducer(state: BoardState, action: Action): BoardState {
     case "move right": {
       if (!state.currentBlock || !state.currentPosition) return state;
 
-      const moveBoard = [...state.board];
-      const moveShape = [...state.currentBlock];
+      // const moveBoard = [...state.board];
+      // const moveShape = [...state.currentBlock];
       const { row, column } = state.currentPosition;
 
-      if (!canMove(moveBoard, moveShape, { row, column: column + 1 })) {
-        return {
-          ...state,
-          currentBlock: state.currentBlock,
-          currentPosition: { row, column },
-        };
-      }
+      // if (!canMove(moveBoard, moveShape, { row, column: column + 1 })) {
+      //   return {
+      //     ...state,
+      //     currentBlock: state.currentBlock,
+      //     currentPosition: { row, column },
+      //   };
+      // }
 
       //writeFile('mR\n');
 
@@ -207,10 +207,10 @@ function reducer(state: BoardState, action: Action): BoardState {
 
       const moveBoard = [...state.board];
       const currentShape = [...state.currentBlock];
-      const { row, column } = state.currentPosition;
+      // const { row, column } = state.currentPosition;
 
       const rotatedShape = rotateBlock(currentShape);
-      if (canMove(moveBoard, rotatedShape, { row, column })) {
+      // if (canMove(moveBoard, rotatedShape, { row, column })) {
 
         // writeFile('mU\n');
 
@@ -220,9 +220,9 @@ function reducer(state: BoardState, action: Action): BoardState {
           currentBlock: rotatedShape,
           currentPosition: state.currentPosition,
         };
-      }
+      // }
 
-      return state;
+      // return state;
     }
 
     default:

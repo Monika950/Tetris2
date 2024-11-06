@@ -23,7 +23,7 @@ const RestartMenu: FC<PopupProps> = ({ score, isOpen, onClose, gameOver, pause }
         <h3 className="subheading">Your score: {score}</h3>
 
         <div className="button-group">
-          <button className="button button-new-game">
+          <button className="button button-new-game" onClick>
             Start New Game
           </button>
           <button className="button button-watch-replay">

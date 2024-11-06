@@ -8,6 +8,35 @@ import { openFile, closeFile } from "../api/file";
 import { getRandomBlock } from "../components/Blocks";
 import { writeFile } from "../api/file";
 
+function canMove(
+  board: SquareType[][],
+  blockShape: SquareType[][],
+  position: { row: number; column: number }
+): boolean {
+  const { row, column } = position;
+
+  if (
+    row < 0 ||
+    row + blockShape.length > board.length ||
+    column < 0 ||
+    column + blockShape[0].length > board[0].length
+  ) {
+    return false;
+  }
+
+  for (let r = 0; r < blockShape.length; r++) {
+    for (let c = 0; c < blockShape[0].length; c++) {
+      if (blockShape[r][c] !== Empty.E) {
+        if (board[row + r][c + column] !== Empty.E) {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 function PlayerGame() {
   const {
     board,
@@ -95,8 +124,10 @@ function PlayerGame() {
             writeFile("mU\n");
           break;
         case "ArrowDown":
-          writeFile("mD\n");
-          moveDown();
+          if (!canMove(board, block, { row: position.row + 1, column: position.column })) {
+            moveDown();
+            writeFile("mD\n");
+          }
         //   if(currentBlockRef.current !== block)
         //     writeFile("mB\n");
           break;
