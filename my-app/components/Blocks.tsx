@@ -92,3 +92,32 @@ export function clearRows(board: SquareType[][], score: number): { board: Square
   
   return { board: [...emptyRows, ...clearedBoard], score }; 
 }
+
+export function canMove(
+  board: SquareType[][],
+  blockShape: SquareType[][],
+  position: { row: number; column: number }
+): boolean {
+  const { row, column } = position;
+
+  if (
+    row < 0 ||
+    row + blockShape.length > board.length ||
+    column < 0 ||
+    column + blockShape[0].length > board[0].length
+  ) {
+    return false;
+  }
+
+  for (let r = 0; r < blockShape.length; r++) {
+    for (let c = 0; c < blockShape[0].length; c++) {
+      if (blockShape[r][c] !== Empty.E) {
+        if (board[row + r][c + column] !== Empty.E) {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}

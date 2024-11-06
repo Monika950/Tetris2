@@ -24,6 +24,7 @@ interface ReplayingProps {
     nextBlock,
     pauseGame,
     pause,
+    freezeBlock
   } = useBoard();
 
   const [isReplaying, setIsReplaying] = useState(false);
@@ -61,14 +62,14 @@ interface ReplayingProps {
             moveDown();
             break;
           case "mB":
-            moveDown();
+            freezeBlock();
             break;
           default:
             break;
         }
       }
     },
-    [moveLeft, moveRight, rotate, moveDown, newBlock]
+    [newBlock, moveLeft, moveRight, rotate, moveDown, freezeBlock]
   );
 
   useEffect(() => {

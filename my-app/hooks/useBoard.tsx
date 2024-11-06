@@ -27,39 +27,11 @@ type Action =
   | { type: "move left" }
   | { type: "move right" }
   | { type: "rotate" }
+  | { type: "freeze" }
   | { type: "pause" };
 
 const getInitialBoard = (): SquareType[][] =>
   Array.from({ length: 20 }, () => Array(10).fill(Empty.E));
-
-// function canMove(
-//   board: SquareType[][],
-//   blockShape: SquareType[][],
-//   position: { row: number; column: number }
-// ): boolean {
-//   const { row, column } = position;
-
-//   if (
-//     row < 0 ||
-//     row + blockShape.length > board.length ||
-//     column < 0 ||
-//     column + blockShape[0].length > board[0].length
-//   ) {
-//     return false;
-//   }
-
-//   for (let r = 0; r < blockShape.length; r++) {
-//     for (let c = 0; c < blockShape[0].length; c++) {
-//       if (blockShape[r][c] !== Empty.E) {
-//         if (board[row + r][c + column] !== Empty.E) {
-//           return false;
-//         }
-//       }
-//     }
-//   }
-
-//   return true;
-// }
 
 function reducer(state: BoardState, action: Action): BoardState {
   switch (action.type) {
@@ -96,39 +68,49 @@ function reducer(state: BoardState, action: Action): BoardState {
       if (!state.currentBlock || !state.currentPosition) return state;
 
       const moveBoard = [...state.board];
-      const moveShape = [...state.currentBlock];
       const { row, column } = state.currentPosition;
       const score = state.score;
 
-      // if (!canMove(moveBoard, moveShape, { row: row + 1, column })) {
+      return {
+        ...state,
+        board: moveBoard,
+        currentBlock: state.currentBlock,
+        nextBlock: state.nextBlock,
+        currentPosition: { row: row + 1, column },
+        score: score,
+      };
+    }
+    case "freeze": {
+      if (!state.currentBlock || !state.currentPosition) return state;
 
-        for (let r = 0; r < moveShape.length; r++) {
-          for (let c = 0; c < moveShape[r].length; c++) {
-            if (moveShape[r][c] !== Empty.E) {
-              moveBoard[row + r][column + c] = moveShape[r][c];
-            }
+      const board = [...state.board];
+      const blockShape = [...state.currentBlock];
+      const { row, column } = state.currentPosition;
+      const score = state.score;
+
+      const { board: newBoard, score: newScore } = clearRows(board, score);
+
+      for (let r = 0; r < blockShape.length; r++) {
+        for (let c = 0; c < blockShape[r].length; c++) {
+          if (blockShape[r][c] !== Empty.E) {
+            board[row + r][column + c] = blockShape[r][c];
           }
         }
+      }
 
-        const { board: newBoard, score: newScore } = clearRows(moveBoard, score);
-
-        if (row === 0) {
-          return {
-            ...state,
-            board: newBoard,
-            currentBlock: null,
-            currentPosition: null,
-            gameOver: true,
-            score: 0,
-          };
-        }
-
-        //writeFile('mB\n');
+      if (row === 0) {
+        return {
+          ...state,
+          board: newBoard,
+          currentBlock: null,
+          currentPosition: null,
+          gameOver: true,
+          score: 0,
+        };
+      }
 
         const blockI = getRandomBlock();
         const nextBlock = BlockShapes[blockI];
-        // if (state.nextBlock)
-        //   writeFile(`${state.nextBlock[0][1]} ${blockI}\n`);
 
         return {
           ...state,
@@ -138,20 +120,7 @@ function reducer(state: BoardState, action: Action): BoardState {
           currentPosition: { row: 0, column: 4 },
           score: newScore,
         };
-      // }
-
-      // writeFile('mD\n');
-
-      // return {
-      //   ...state,
-      //   board: moveBoard,
-      //   currentBlock: state.currentBlock,
-      //   nextBlock: state.nextBlock,
-      //   currentPosition: { row: row + 1, column },
-      //   score: score,
-      // };
     }
-
     case "move left": {
       if (!state.currentBlock || !state.currentPosition) return state;
 
@@ -207,7 +176,6 @@ function reducer(state: BoardState, action: Action): BoardState {
 
       const moveBoard = [...state.board];
       const currentShape = [...state.currentBlock];
-      // const { row, column } = state.currentPosition;
 
       const rotatedShape = rotateBlock(currentShape);
       // if (canMove(moveBoard, rotatedShape, { row, column })) {
@@ -249,6 +217,12 @@ export default function useBoard() {
     }
   }, [board.gameOver, board.pause]);
 
+  const freezeBlock = useMemo(() => () => {
+    if (!board.gameOver && !board.pause) {
+      setBoard({ type: "freeze" });
+    }
+  }, [board.gameOver, board.pause]);
+
   const startNewGame = useMemo(() => () => {
     console.log('start new game');
     setBoard({ type: "start" });
@@ -259,8 +233,6 @@ export default function useBoard() {
     const block = BlockShapes[blockI];
     const nextBlock = BlockShapes[nextI];
 
-    // writeFile(`${blockI} ${nextI}\n`);
-
     setBoard({
       type: "new block",
       payload:
@@ -270,8 +242,6 @@ export default function useBoard() {
       },
     });
   };
-
-
 
   const moveLeft = useMemo(() => () => {
     if (!board.gameOver && !board.pause) {
@@ -312,5 +282,6 @@ export default function useBoard() {
     nextBlock: board.nextBlock,
     pauseGame,
     pause: board.pause,
+    freezeBlock
   };
 }
