@@ -55,7 +55,7 @@ function PlayerGame() {
   }, [gameOver, isGameStarted]);
 
   useEffect(() => {
-    if (board.length && !block && !position) {
+    if (board.length && !block && !position) { //tuk
     
       const currentBlock = getRandomBlock();
       const nextBlock = getRandomBlock();
@@ -111,7 +111,7 @@ function PlayerGame() {
             moveDown();
             writeFile("mD\n");
           } else {
-            freezeBlock(board, block, { row: position.row, column: position.column });
+            freezeBlock();
             writeFile("mB\n");
           }   //povtarq se
           break;
@@ -119,7 +119,7 @@ function PlayerGame() {
           break;
       }
     },
-    [isGameStarted, pause, position, board, block, moveLeft, moveRight, rotate, moveDown]
+    [isGameStarted, pause, position, board, block, moveLeft, moveRight, rotate, moveDown, freezeBlock]
   );
 
   const handleCloseMenu = () => {

@@ -1,11 +1,6 @@
 import { useReducer, useMemo } from "react";
 import { SquareType, Empty, Block } from "../components/types";
-import { getRandomBlock, rotateBlock, clearRows, BlockShapes} from "../components/Blocks";
-//import { writeFile } from "../api/file";
-
-// import { debounce } from "lodash";
-
-// const debouncedWriteFile = debounce(writeFile,0);
+import {rotateBlock, clearRows, BlockShapes} from "../components/Blocks";
 
 interface BoardState {
   board: SquareType[][];
@@ -87,9 +82,7 @@ function reducer(state: BoardState, action: Action): BoardState {
       const blockShape = [...state.currentBlock];
       const { row, column } = state.currentPosition;
       const score = state.score;
-
-      const { board: newBoard, score: newScore } = clearRows(board, score);
-
+      
       for (let r = 0; r < blockShape.length; r++) {
         for (let c = 0; c < blockShape[r].length; c++) {
           if (blockShape[r][c] !== Empty.E) {
@@ -98,6 +91,8 @@ function reducer(state: BoardState, action: Action): BoardState {
         }
       }
 
+      const { board: newBoard, score: newScore } = clearRows(board, score);
+
       if (row === 0) {
         return {
           ...state,
@@ -105,18 +100,18 @@ function reducer(state: BoardState, action: Action): BoardState {
           currentBlock: null,
           currentPosition: null,
           gameOver: true,
-          score: 0,
+          score: newScore,
         };
       }
 
-        const blockI = getRandomBlock();
-        const nextBlock = BlockShapes[blockI];
+        // const blockI = getRandomBlock();
+        // const nextBlock = BlockShapes[blockI];
 
         return {
           ...state,
           board: newBoard,
           currentBlock: state.nextBlock,
-          nextBlock: nextBlock,
+          nextBlock: null,// tuk
           currentPosition: { row: 0, column: 4 },
           score: newScore,
         };
@@ -124,73 +119,31 @@ function reducer(state: BoardState, action: Action): BoardState {
     case "move left": {
       if (!state.currentBlock || !state.currentPosition) return state;
 
-      // const moveBoard = [...state.board];
-      // const moveShape = [...state.currentBlock];
-      const { row, column } = state.currentPosition;
-
-      // if (!canMove(moveBoard, moveShape, { row, column: column - 1 })) {
-      //   return {
-      //     ...state,
-      //     currentBlock: state.currentBlock,
-      //     currentPosition: { row: row, column: column },
-      //   };
-      // }
-
-      //writeFile('mL\n');
-
-
       return {
         ...state,
         currentBlock: state.currentBlock,
-        currentPosition: { row: row, column: column - 1 },
+        currentPosition: { row:state.currentPosition.row, column: state.currentPosition.column - 1 },
       };
     }
 
     case "move right": {
       if (!state.currentBlock || !state.currentPosition) return state;
 
-      // const moveBoard = [...state.board];
-      // const moveShape = [...state.currentBlock];
-      const { row, column } = state.currentPosition;
-
-      // if (!canMove(moveBoard, moveShape, { row, column: column + 1 })) {
-      //   return {
-      //     ...state,
-      //     currentBlock: state.currentBlock,
-      //     currentPosition: { row, column },
-      //   };
-      // }
-
-      //writeFile('mR\n');
-
-
       return {
         ...state,
         currentBlock: state.currentBlock,
-        currentPosition: { row, column: column + 1 },
+        currentPosition: {row:state.currentPosition.row, column: state.currentPosition.column + 1 },
       };
     }
 
     case "rotate": {
       if (!state.currentBlock || !state.currentPosition) return state;
-
-      const moveBoard = [...state.board];
-      const currentShape = [...state.currentBlock];
-
-      const rotatedShape = rotateBlock(currentShape);
-      // if (canMove(moveBoard, rotatedShape, { row, column })) {
-
-        // writeFile('mU\n');
-
-        return {
-          ...state,
-          board: moveBoard,
-          currentBlock: rotatedShape,
-          currentPosition: state.currentPosition,
-        };
-      // }
-
-      // return state;
+ 
+      return {
+        ...state,
+        currentBlock: rotateBlock(state.currentBlock),
+        currentPosition: state.currentPosition,
+      };
     }
 
     default:
