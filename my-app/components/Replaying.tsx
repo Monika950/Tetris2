@@ -3,6 +3,7 @@ import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";
 import useBoard from "../hooks/useBoard";
+import { BlockShapes } from "./Blocks";
 
 interface ReplayingProps {
     moves: string[];
@@ -45,7 +46,7 @@ interface ReplayingProps {
 
       if (move.includes(" ")) {
         const [blockStr1, blockStr2] = move.split(" ");
-        newBlock(blockStr1, blockStr2);
+        newBlock(BlockShapes[blockStr1], BlockShapes[blockStr2]);
         
       } else {
         switch (move) {

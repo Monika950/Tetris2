@@ -7,7 +7,6 @@ import RestartMenu from "../components/RestartMenu";
 import { openFile, closeFile } from "../api/file";
 import { getRandomBlock, rotateBlock, canMove} from "../components/Blocks";
 import { writeFile } from "../api/file";
-//import {  Block, Empty } from "./types";
 
 function PlayerGame() {
   const {
@@ -85,55 +84,73 @@ function PlayerGame() {
       return () => clearInterval(intervalId);
     }
   }, [moveDown, isGameStarted, pause, position, board, block, handleFreeze]);
-
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!isGameStarted || pause || !position) return;
-
-      switch (event.key) {
-          case "ArrowLeft":
-            if (canMove(board, block, { row: position.row, column: position.column-1 })) {
-              moveLeft();
-              writeFile("mL\n");
-            }
-            break;
-        case "ArrowRight":
-          if (canMove(board, block, { row: position.row, column: position.column+1 })) {
-              moveRight();
-              writeFile("mR\n");
-            }
-          break;
-          case "ArrowUp": {
-            const rotated = rotateBlock(block);
-            if (canMove(board, rotated, { row: position.row, column: position.column })) {
-                rotate();
-                writeFile("mU\n");
-            }
-            break;
-        }
-        case "ArrowDown":
-          if (canMove(board, block, { row: position.row + 1, column: position.column })) {
-            moveDown();
-            writeFile("mD\n");
-          } else {
-            console.log('ff');
-            handleFreeze();
-            writeFile("mB\n");
-          }  
-          break;
-        default:
-          break;
-      }
-    },
-    [isGameStarted, pause, position, board, block, moveLeft, moveRight, rotate, moveDown, handleFreeze]
-  );
-
+  
   const handleCloseMenu = () => {
     if (pause) pauseGame();
   };
-  
-  return (
-    <div tabIndex={0} onKeyDown={handleKeyDown} className="game" autoFocus>
+
+ const [pressedKeys, setPressedKeys] = useState<{ [key: string]: boolean }>({});
+
+const handleKeyDown = useCallback(
+  (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!isGameStarted || pause || !position) return;
+
+    const key = event.key;
+    
+    if (pressedKeys[key]) return;
+    
+    setPressedKeys((prevKeys) => ({ ...prevKeys, [key]: true }));
+
+    switch (key) {
+      case "ArrowLeft":
+        if (canMove(board, block, { row: position.row, column: position.column - 1 })) {
+          moveLeft();
+          writeFile("mL\n");
+        }
+        break;
+      case "ArrowRight":
+        if (canMove(board, block, { row: position.row, column: position.column + 1 })) {
+          moveRight();
+          writeFile("mR\n");
+        }
+        break;
+      case "ArrowUp": {
+        const rotated = rotateBlock(block);
+        if (canMove(board, rotated, { row: position.row, column: position.column })) {
+          rotate();
+          writeFile("mU\n");
+        }
+        break;
+      }
+      case "ArrowDown":
+        if (canMove(board, block, { row: position.row + 1, column: position.column })) {
+          moveDown();
+          writeFile("mD\n");
+        } else {
+          handleFreeze();
+          writeFile("mB\n");
+        }
+        break;
+      default:
+        break;
+    }
+  },
+  [isGameStarted, pause, position, board, block, moveLeft, moveRight, rotate, moveDown, handleFreeze, pressedKeys]
+);
+
+const handleKeyUp = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+  const key = event.key;
+  setPressedKeys((prevKeys) => ({ ...prevKeys, [key]: false }));
+}, []);
+
+return (
+  <div
+    tabIndex={0}
+    onKeyDown={handleKeyDown}
+    onKeyUp={handleKeyUp}
+    className="game"
+    autoFocus
+  >
       <button onClick={pauseGame}>{pause ? "Resume" : "Pause"}</button>
 
       <RestartMenu
