@@ -96,3 +96,9 @@ app.post('/file/write', (req, res) => {
 app.listen(3000, () => {
     console.log('listening on port 3000');
 })
+
+
+
+// const io = require('socket.io')(3000);
+
+// io.on("connection",socket);
