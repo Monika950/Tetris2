@@ -1,4 +1,4 @@
-//import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { SquareType, Block, Empty } from "./types";
 
 export const BlockShapes: { [key in Block]: SquareType[][] } = {
@@ -39,13 +39,21 @@ export const BlockShapes: { [key in Block]: SquareType[][] } = {
 //     return [randomBlock,cloneDeep(BlockShapes[randomBlock])]; 
 //   } 
 
-export function getRandomBlock(): Block {
-  const blockValues = Object.values(Block);
-  const randomIndex = Math.floor(Math.random() * blockValues.length);
-  const randomBlock = blockValues[randomIndex];
+// export function getRandomBlock(): Block {
+//   const blockValues = Object.values(Block);
+//   const randomIndex = Math.floor(Math.random() * blockValues.length);
+//   const randomBlock = blockValues[randomIndex];
 
-  return randomBlock; 
-} 
+//   return randomBlock; 
+// }
+
+export function getRandomBlock(): SquareType[][] {
+    const blockValues = Object.values(Block);
+    const randomIndex = Math.floor(Math.random() * blockValues.length);
+    const randomBlock = blockValues[randomIndex];
+  
+    return cloneDeep(BlockShapes[randomBlock]); 
+  } 
 
 export function rotateBlock(blockShape: SquareType[][]): SquareType[][] {
     const shapeHeight = blockShape.length;

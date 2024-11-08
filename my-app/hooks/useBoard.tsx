@@ -50,7 +50,7 @@ function reducer(state: BoardState, action: Action): BoardState {
 
     case "new block": {
       const { block, nextBlock } = action.payload;
-
+      
       return {
         ...state,
         currentBlock: block,
@@ -104,15 +104,10 @@ function reducer(state: BoardState, action: Action): BoardState {
         };
       }
 
-        // const blockI = getRandomBlock();
-        // const nextBlock = BlockShapes[blockI];
-
         return {
           ...state,
           board: newBoard,
-          currentBlock: state.nextBlock,
-          nextBlock: null,// tuk
-          currentPosition: { row: 0, column: 4 },
+          currentBlock: null,
           score: newScore,
         };
     }
@@ -177,21 +172,16 @@ export default function useBoard() {
   }, [board.gameOver, board.pause]);
 
   const startNewGame = useMemo(() => () => {
-    console.log('start new game');
     setBoard({ type: "start" });
   }, [])
 
-  const newBlock = (blockI:Block,nextI:Block) => {
-    console.log('new block');
-    const block = BlockShapes[blockI];
-    const nextBlock = BlockShapes[nextI];
-
+  const newBlock = (block:SquareType[][],next:SquareType[][]) => {
     setBoard({
       type: "new block",
       payload:
       {
         block: block,
-        nextBlock: nextBlock,
+        nextBlock: next,
       },
     });
   };

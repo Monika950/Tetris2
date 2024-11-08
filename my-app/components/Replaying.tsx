@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React,{ useCallback, useEffect, useState } from "react";
 import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";

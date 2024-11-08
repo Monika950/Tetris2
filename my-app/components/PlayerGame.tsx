@@ -7,6 +7,7 @@ import RestartMenu from "../components/RestartMenu";
 import { openFile, closeFile } from "../api/file";
 import { getRandomBlock, rotateBlock, canMove} from "../components/Blocks";
 import { writeFile } from "../api/file";
+//import {  Block, Empty } from "./types";
 
 function PlayerGame() {
   const {
@@ -28,7 +29,7 @@ function PlayerGame() {
   } = useBoard();
 
   const [isGameStarted, setIsGameStarted] = useState(false);
-  
+
   const handleGameStart = useCallback((): void => {
     openFile()
       .then(() => {
@@ -55,16 +56,21 @@ function PlayerGame() {
   }, [gameOver, isGameStarted]);
 
   useEffect(() => {
-    if (board.length && !block && !position) { //tuk
-    
-      const currentBlock = getRandomBlock();
-      const nextBlock = getRandomBlock();
-      
-      writeFile(`${currentBlock} ${nextBlock}\n`);
+    if (board.length && !block && !gameOver) {
+      const currentBlock = nextBlock;
+      const newNBlock = getRandomBlock();
 
-      newBlock(currentBlock, nextBlock);
+      if(currentBlock && newNBlock)
+      writeFile(`${currentBlock[0][1]} ${newNBlock[0][1]}\n`);
+
+      newBlock(currentBlock, newNBlock);
     }
-  }, [board, block, position, newBlock]);
+  }, [board, block, newBlock, gameOver, nextBlock]);
+
+  const handleFreeze = useCallback(() => {
+    freezeBlock();
+    writeFile("mB\n");   
+  }, [freezeBlock]);
 
   useEffect(() => {
     if (isGameStarted && !pause) {
@@ -73,13 +79,12 @@ function PlayerGame() {
           moveDown();
           writeFile("mD\n");
         } else {
-          freezeBlock();
-          writeFile("mB\n");
+         handleFreeze();
         }
       }, 1000);
       return () => clearInterval(intervalId);
     }
-  }, [moveDown, isGameStarted, pause, position, board, block, freezeBlock]);
+  }, [moveDown, isGameStarted, pause, position, board, block, handleFreeze]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -111,15 +116,16 @@ function PlayerGame() {
             moveDown();
             writeFile("mD\n");
           } else {
-            freezeBlock();
+            console.log('ff');
+            handleFreeze();
             writeFile("mB\n");
-          }   //povtarq se
+          }  
           break;
         default:
           break;
       }
     },
-    [isGameStarted, pause, position, board, block, moveLeft, moveRight, rotate, moveDown, freezeBlock]
+    [isGameStarted, pause, position, board, block, moveLeft, moveRight, rotate, moveDown, handleFreeze]
   );
 
   const handleCloseMenu = () => {
