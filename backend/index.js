@@ -7,6 +7,50 @@ const path = require('path');
 app.use(cors()); 
 app.use(express.json());
 
+const io = require('socket.io')(8080, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
+
+
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('error', (error) => {
+    console.error('Socket encountered error:', error);
+  });
+
+  socket.on('gameStart', () => {
+    console.log("Game started by client:", socket.id);
+    socket.broadcast.emit('gameStartAck', { message: "Game started on server" });//????
+  });
+
+  socket.on('gameAction', (actionData) => {
+    console.log(`Received action: ${actionData.event} from client ${socket.id}`);
+
+    if (fileDescriptor) {
+      const actionLine = `${actionData.event}\n`;
+      console.log(actionLine);
+      fs.write(fileDescriptor, actionLine, (err) => {
+        if (err) {
+          console.error("Error writing action to file:", err);
+        } else {
+          console.log("Action recorded:", actionLine.trim());
+        }
+      });
+    } else {
+      console.warn("No file is open; action not recorded.");
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+
 let fileDescriptor = null; 
 
 app.post('/file/open', (req, res) => {
@@ -23,20 +67,20 @@ app.post('/file/open', (req, res) => {
   }
   })
 
-app.post('/file/write', (req, res) => {
-    const { content } = req.body;
+// app.post('/file/write', (req, res) => {
+//     const { content } = req.body;
     
-    if (!fileDescriptor) {
-      return res.status(400).json({ message: 'File not opened yet. Please open the file first.' });
-    }
+//     if (!fileDescriptor) {
+//       return res.status(400).json({ message: 'File not opened yet. Please open the file first.' });
+//     }
   
-    fs.write(fileDescriptor, content, (err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Failed to write to the file', error: err });
-      }
-      res.status(200).json({ message: 'Content written to the file successfully bla' });
-    });
-  });
+//     fs.write(fileDescriptor, content, (err) => {
+//       if (err) {
+//         return res.status(500).json({ message: 'Failed to write to the file', error: err });
+//       }
+//       res.status(200).json({ message: 'Content written to the file successfully bla' });
+//     });
+//   });
 
   app.post('/file/close', (req, res) => {
     try {
@@ -98,7 +142,3 @@ app.listen(3000, () => {
 })
 
 
-
-// const io = require('socket.io')(3000);
-
-// io.on("connection",socket);

@@ -6,7 +6,9 @@ import useBoard from "../hooks/useBoard";
 import RestartMenu from "../components/RestartMenu";
 import { openFile, closeFile } from "../api/file";
 import { getRandomBlock, rotateBlock, canMove} from "../components/Blocks";
-import { writeFile } from "../api/file";
+//import { writeFile } from "../api/file";
+
+import { socket } from '../api/socket';
 
 function PlayerGame() {
   const {
@@ -36,6 +38,8 @@ function PlayerGame() {
         setIsGameStarted(true);
       })
       .catch(error => console.error("Error opening file:", error));
+      
+      socket.emit("gameStart");
   }, [startNewGame, setIsGameStarted]);
   
 
@@ -45,12 +49,23 @@ function PlayerGame() {
     }
   }, [handleGameStart, isGameStarted]);
 
+  useEffect(() => {//??
+    socket.on("gameStartAck", (data) => {
+      console.log(data.message); 
+    });
+
+    // return () => {
+    //   socket.disconnect();
+    // };
+  }, []);
+
   useEffect(() => {
     if (gameOver && isGameStarted) {
       closeFile()
         .then(() => {
           setIsGameStarted(false);
         });
+        socket.disconnect();
     }
   }, [gameOver, isGameStarted]);
 
@@ -59,16 +74,20 @@ function PlayerGame() {
       const currentBlock = nextBlock;
       const newNBlock = getRandomBlock();
 
-      if(currentBlock && newNBlock)
-      writeFile(`${currentBlock[0][1]} ${newNBlock[0][1]}\n`);
-
-      newBlock(currentBlock, newNBlock);
+      if(currentBlock && newNBlock){
+      // writeFile(`${currentBlock[0][1]} ${newNBlock[0][1]}\n`);
+        socket.emit("gameAction", {
+          event: `${currentBlock[0][1]} ${newNBlock[0][1]}`,
+        });
+      }
+        newBlock(currentBlock, newNBlock);
     }
   }, [board, block, newBlock, gameOver, nextBlock]);
 
   const handleFreeze = useCallback(() => {
     freezeBlock();
-    writeFile("mB\n");   
+    socket.emit("gameAction", { event: "mB" });
+    //writeFile("mB\n");   
   }, [freezeBlock]);
 
   useEffect(() => {
@@ -76,7 +95,8 @@ function PlayerGame() {
       const intervalId = setInterval(() => {
         if (canMove(board, block, { row: position.row + 1, column: position.column })) {
           moveDown();
-          writeFile("mD\n");
+          //writeFile("mD\n");
+          socket.emit("gameAction", { event: "mD" });
         } else {
          handleFreeze();
         }
@@ -92,51 +112,52 @@ function PlayerGame() {
  const [pressedKeys, setPressedKeys] = useState<{ [key: string]: boolean }>({});
 
 const handleKeyDown = useCallback(
-  (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!isGameStarted || pause || !position) return;
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!isGameStarted || pause || !position) return;
 
-    const key = event.key;
-    
-    if (pressedKeys[key]) return;
-    
-    setPressedKeys((prevKeys) => ({ ...prevKeys, [key]: true }));
+      const key = event.key;
+      if (pressedKeys[key]) return;
 
-    switch (key) {
-      case "ArrowLeft":
-        if (canMove(board, block, { row: position.row, column: position.column - 1 })) {
-          moveLeft();
-          writeFile("mL\n");
+      setPressedKeys((prevKeys) => ({ ...prevKeys, [key]: true }));
+
+      let actionEvent = "";
+      switch (key) {
+        case "ArrowLeft":
+          if (canMove(board, block, { row: position.row, column: position.column - 1 })) {
+            moveLeft();
+            actionEvent = "mL";
+          }
+          break;
+        case "ArrowRight":
+          if (canMove(board, block, { row: position.row, column: position.column + 1 })) {
+            moveRight();
+            actionEvent = "mR";
+          }
+          break;
+        case "ArrowUp": {
+          const rotated = rotateBlock(block);
+          if (canMove(board, rotated, { row: position.row, column: position.column })) {
+            rotate();
+            actionEvent = "mU";
+          }
+          break;
         }
-        break;
-      case "ArrowRight":
-        if (canMove(board, block, { row: position.row, column: position.column + 1 })) {
-          moveRight();
-          writeFile("mR\n");
-        }
-        break;
-      case "ArrowUp": {
-        const rotated = rotateBlock(block);
-        if (canMove(board, rotated, { row: position.row, column: position.column })) {
-          rotate();
-          writeFile("mU\n");
-        }
-        break;
+        case "ArrowDown":
+          if (canMove(board, block, { row: position.row + 1, column: position.column })) {
+            moveDown();
+            actionEvent = "mD";
+          } else {
+            handleFreeze();
+            actionEvent = "mB";
+          }
+          break;
+        default:
+          break;
       }
-      case "ArrowDown":
-        if (canMove(board, block, { row: position.row + 1, column: position.column })) {
-          moveDown();
-          writeFile("mD\n");
-        } else {
-          handleFreeze();
-          writeFile("mB\n");
-        }
-        break;
-      default:
-        break;
-    }
-  },
-  [isGameStarted, pause, position, board, block, moveLeft, moveRight, rotate, moveDown, handleFreeze, pressedKeys]
-);
+      if (actionEvent) socket.emit("gameAction", { event: actionEvent });
+    },
+    [isGameStarted, pause, position, board, block, moveLeft, moveRight, rotate, moveDown, handleFreeze, pressedKeys]
+  );
 
 const handleKeyUp = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
   const key = event.key;
