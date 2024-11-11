@@ -24,15 +24,12 @@ io.on('connection', (socket) => {
 
   socket.on('gameStart', () => {
     console.log("Game started by client:", socket.id);
-    socket.broadcast.emit('gameStartAck', { message: "Game started on server" });//????
+    socket.emit('gameStartAck', { message: "Game started on server" });
   });
 
   socket.on('gameAction', (actionData) => {
-    console.log(`Received action: ${actionData.event} from client ${socket.id}`);
-
     if (fileDescriptor) {
       const actionLine = `${actionData.event}\n`;
-      console.log(actionLine);
       fs.write(fileDescriptor, actionLine, (err) => {
         if (err) {
           console.error("Error writing action to file:", err);

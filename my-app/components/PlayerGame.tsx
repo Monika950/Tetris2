@@ -49,14 +49,14 @@ function PlayerGame() {
     }
   }, [handleGameStart, isGameStarted]);
 
-  useEffect(() => {//??
+  useEffect(() => {
     socket.on("gameStartAck", (data) => {
       console.log(data.message); 
     });
 
-    // return () => {
-    //   socket.disconnect();
-    // };
+    return () => {
+      socket.off('disconnect');
+    };
   }, []);
 
   useEffect(() => {
