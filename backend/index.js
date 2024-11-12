@@ -1,19 +1,21 @@
 const express = require('express');
-const cors = require('cors');
 const app = express();
+const server = require('http').createServer(app);
+const port = process.env.PORT || 3000;
+
+const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 
 app.use(cors()); 
 app.use(express.json());
 
-const io = require('socket.io')(8080, {
+const io = require('socket.io')(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://localhost:5174","http://localhost:5173"],
     methods: ["GET", "POST"]
   }
 });
-
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
@@ -134,8 +136,10 @@ app.post('/file/open', (req, res) => {
     });
   });
 
-app.listen(3000, () => {
-    console.log('listening on port 3000');
-})
+server.listen(port, function() {
+  console.log(`Listening on port ${port}`);
+});
 
-
+// конуру
+// vitest
+//react testing library
