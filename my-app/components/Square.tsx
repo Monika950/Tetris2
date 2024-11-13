@@ -9,7 +9,7 @@ interface SquareProps
 
 const Square: React.FC<SquareProps> = ({type}) => {
   return (
-    <div className={`square ${type}`} />
+    <div data-testid="square"  className={`square ${type}`} />
   );
 };
 

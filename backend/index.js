@@ -143,3 +143,4 @@ server.listen(port, function() {
 // конуру
 // vitest
 //react testing library
+// greshka ako ne e svurzan kum survura
