@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest --coverage"
   },
   "dependencies": {
     "@socket.io/admin-ui": "^0.5.1",
@@ -27,11 +27,13 @@
     "@types/react-dom": "^18.3.1",
     "@types/socket.io-client": "^1.4.36",
     "@vitejs/plugin-react": "^4.3.2",
+    "@vitest/coverage-v8": "^2.1.4",
     "eslint": "^9.11.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.12",
     "global-jsdom": "^25.0.0",
     "globals": "^15.9.0",
+    "istanbul-reports": "^3.1.7",
     "jsdom": "^25.0.1",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.7.0",

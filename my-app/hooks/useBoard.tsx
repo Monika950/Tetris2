@@ -1,6 +1,6 @@
 import { useReducer, useMemo } from "react";
 import { SquareType, Empty, Block } from "../components/types";
-import {rotateBlock, clearRows, BlockShapes} from "../components/Blocks";
+import {rotateBlock, clearRows, BlockShapes} from "../components/blockOperations.ts";
 
 interface BoardState {
   board: SquareType[][];

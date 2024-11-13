@@ -1,3 +1,4 @@
+import React from "react";
 import "./board.css";
 import { useMemo } from "react";
 import Square from "./Square";

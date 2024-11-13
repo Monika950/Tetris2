@@ -3,7 +3,7 @@ import Board from "../components/Board";
 import ScoreBoard from "../components/ScoreBoard";
 import Preview from "../components/Preview";
 import useBoard from "../hooks/useBoard";
-import { BlockShapes } from "./Blocks";
+import { BlockShapes } from "./blockOperations.ts";
 
 interface ReplayingProps {
     moves: string[];
