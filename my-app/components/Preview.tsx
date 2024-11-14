@@ -10,7 +10,7 @@ const Preview: React.FC<PreviewProps> = ({ shape }) => {
   return (
     <div className="preview-container">
       <h2>Next Block</h2>
-      <div className="board">
+      <div className="board" aria-label="next-block-board">
         {shape && shape.map((row, rowIndex) => (
           <div key={rowIndex} className="row">
             {row && row.map((square, colIndex) => (
