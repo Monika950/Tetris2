@@ -2,7 +2,7 @@ import React from "react";
 import "./board.css";
 import { useMemo } from "react";
 import Square from "./Square";
-import { SquareType, Empty} from "./types";
+import { SquareType, Empty } from "./types";
 
 interface BoardProps {
   board: SquareType[][];
@@ -11,9 +11,7 @@ interface BoardProps {
 }
 
 function Board({ board, block, position }: BoardProps) {
-
   const combinedBoard = useMemo(() => {
-
     const boardCopy = board.map(row => [...row]);
 
     if (block && position) {
@@ -44,9 +42,9 @@ function Board({ board, block, position }: BoardProps) {
   }, [board, block, position]);
 
   return (
-    <div className="board">
+    <div className="board" role="grid" aria-label="game-board">
       {combinedBoard.map((row, rowIndex) => (
-        <div key={rowIndex} className="row">
+        <div key={rowIndex} className="row" role="row">
           {row.map((square, colIndex) => (
             <Square key={`${rowIndex}-${colIndex}`} type={square} />
           ))}
