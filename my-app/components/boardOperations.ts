@@ -5,9 +5,7 @@ export function canClearRow(row: SquareType[]):(boolean)
    return row.every(cell => cell !== Empty.E);
 }
 
-export function clearRows(board: SquareType[][], score: number): { board: SquareType[][], score: number } {
-  const clearedBoard = board.filter(row => !canClearRow(row));
-  const numberOfRowsCleared = board.length - clearedBoard.length; 
+export function updateScore(numberOfRowsCleared: number, score: number): number {
   switch (numberOfRowsCleared) {
     case 1:
       score += 20;
@@ -24,10 +22,20 @@ export function clearRows(board: SquareType[][], score: number): { board: Square
     default:
       break;
   }
+  return score; 
+}
+
+export function clearRows(board: SquareType[][], score: number): { board: SquareType[][], score: number } {
+  const clearedBoard = board.filter(row => !canClearRow(row));
+  const numberOfRowsCleared = board.length - clearedBoard.length; 
+
+  score = updateScore(numberOfRowsCleared, score);
+
   const emptyRows = Array.from({ length: numberOfRowsCleared }, () => Array(board[0].length).fill(Empty.E));
   
   return { board: [...emptyRows, ...clearedBoard], score }; 
 }
+
 
 export function canMove(
   board: SquareType[][],

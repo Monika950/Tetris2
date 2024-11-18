@@ -1,3 +1,6 @@
+# coverage unit tests
+coverage/
+
 # Logs
 logs
 *.log
