@@ -28,7 +28,10 @@ function ReplayGame() {
       {!isReplaying ? (
         <PreviousGames savedGames={savedGames} onSelectGame={handleSelectedGame} />
       ) : (
+        <>
+        <h2>REPLAY</h2>
         <Replaying moves={moves} />
+        </>
       )}
     </div>
   );

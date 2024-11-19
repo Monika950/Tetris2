@@ -1,5 +1,5 @@
 import { vi, expect, it, describe } from 'vitest';
-import { openFile, closeFile, getGames } from '../api/file'; 
+import { openFile, closeFile, getGames, readFile } from '../api/file'; 
 
 
 global.fetch = vi.fn() as unknown as ReturnType<typeof vi.fn>;
@@ -125,6 +125,66 @@ describe('closeFile function', () => {
       const result = await getGames();
   
       expect(errorSpy).toHaveBeenCalledWith('Error:', new Error('Network Error'));
+  
+      expect(result).toBeUndefined();
+  
+      errorSpy.mockRestore();
+    });
+  });
+
+
+  describe('readFile function', () => {
+
+    it('should return the file content as an array when fetch is successful', async () => {
+      const mockResponse = { content: 'Line1\nLine2\nLine3' };
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: vi.fn().mockResolvedValueOnce(mockResponse),
+      });
+  
+      const logSpy = vi.spyOn(console, 'log');
+  
+      const result = await readFile('testFile.txt');
+  
+      expect(logSpy).toHaveBeenCalledWith(
+        'File content successfully retrieved:',
+        mockResponse.content
+      );
+      expect(logSpy).toHaveBeenCalledWith('File content as array:', ['Line1', 'Line2', 'Line3']);
+  
+      expect(result).toEqual(['Line1', 'Line2', 'Line3']);
+  
+      logSpy.mockRestore();
+    });
+  
+    it('should throw an error and log it when the response is not OK', async () => {
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn(),
+      });
+  
+      const errorSpy = vi.spyOn(console, 'error');
+  
+      const result = await readFile('invalidFile.txt');
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        'Error reading file:',
+        new Error('Failed to read file: invalidFile.txt')
+      );
+  
+      expect(result).toBeUndefined();
+  
+      errorSpy.mockRestore();
+    });
+  
+    it('should handle network errors and log them', async () => {
+      (fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network Error'));
+  
+      const errorSpy = vi.spyOn(console, 'error');
+  
+      const result = await readFile('networkFail.txt');
+
+      expect(errorSpy).toHaveBeenCalledWith('Error reading file:', new Error('Network Error'));
   
       expect(result).toBeUndefined();
   

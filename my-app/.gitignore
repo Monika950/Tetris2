@@ -1,6 +1,5 @@
 # coverage unit tests
-coverage/*.html
-coverage/
+coverage
 
 # Logs
 logs

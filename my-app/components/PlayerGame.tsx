@@ -186,6 +186,7 @@ return (
 
       {isGameStarted && (
         <>
+          <h2>TETRIS</h2>
           <Board board={board} block={block} position={position} />
           <ScoreBoard score={score} />
           <Preview shape={nextBlock} />
