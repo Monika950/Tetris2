@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import { SquareType, Block, Empty } from "./types";
+import { SquareType, Block, Empty } from "./GameComps/types";
 
 export const BlockShapes: { [key in Block]: SquareType[][] } = {
     [Block.S]: [

@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { BlockShapes, getRandomBlock } from '../components/blockShapes';
+import { Block } from '../components/GameComps/types'; 
 
 beforeAll(() => {
   vi.spyOn(Math, 'random')

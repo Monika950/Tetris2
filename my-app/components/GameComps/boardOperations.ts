@@ -1,4 +1,4 @@
-import { SquareType, Empty } from "./types";
+import { SquareType, Empty } from "../types";
 
 export function canClearRow(row: SquareType[]):(boolean)
 {
