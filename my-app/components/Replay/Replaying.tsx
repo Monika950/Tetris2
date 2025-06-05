@@ -1,9 +1,9 @@
 import React,{ useCallback, useEffect, useState } from "react";
-import Board from "../Board.tsx";
+import Board from "../GameComps/Board.tsx";
 import ScoreBoard from "../ScoreBoard.tsx";
 import Preview from "../Preview.tsx";
 import useBoard from "../../hooks/useBoard.tsx";
-import { BlockShapes } from "../blockOperations.ts";
+import { BlockShapes } from "../blockShapes.ts";
 
 interface ReplayingProps {
     moves: string[];

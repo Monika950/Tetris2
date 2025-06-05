@@ -1,7 +1,7 @@
 import "./App.css";
 import {useState} from "react";
-import PlayerGame from "../components/PlayerGame";
-import ReplayGame from "../components/ReplayGame";
+import PlayerGame from "../components/PlayerGame/PlayerGame";
+import ReplayGame from "../components/Replay/ReplayGame";
 
 
 function App() {

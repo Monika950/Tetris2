@@ -1,7 +1,7 @@
 import { useReducer, useMemo } from "react";
-import { SquareType, Empty } from "../components/types";
-import {rotateBlock} from "../components/blockOperations.ts";
-import {clearRows} from "../components/boardOperations.ts";
+import { SquareType, Empty } from "../components/GameComps/types";
+import {rotateBlock} from "../components/GameComps/blockOperations.ts";
+import {clearRows} from "../components/GameComps/boardOperations.ts";
 
 interface BoardState {
   board: SquareType[][];

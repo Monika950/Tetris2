@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import PreviousGames from '../components/PreviousGames';
-import Replaying from '../components/Replaying';
-import { getGames, readFile } from '../api/file';
+import PreviousGames from './PreviousGames';
+import Replaying from './Replaying';
+import { getGames, readFile } from '../../api/file';
 
 function ReplayGame() {
   const [savedGames, setSavedGames] = useState<string[]>([]);

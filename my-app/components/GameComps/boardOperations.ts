@@ -1,4 +1,4 @@
-import { SquareType, Empty } from "../types";
+import { SquareType, Empty } from "../GameComps/types";
 
 export function canClearRow(row: SquareType[]):(boolean)
 {
@@ -24,19 +24,6 @@ export function updateScore(numberOfRowsCleared: number, score: number): number 
   }
   return score; 
 }
-
-export function clearRows(board: SquareType[][], score: number): { board: SquareType[][], score: number } {
-  const clearedBoard = board.filter(row => !canClearRow(row));
-  const numberOfRowsCleared = board.length - clearedBoard.length; 
-
-  score = updateScore(numberOfRowsCleared, score);
-
-  const emptyRows = Array.from({ length: numberOfRowsCleared }, () => Array(board[0].length).fill(Empty.E));
-  
-  return { board: [...emptyRows, ...clearedBoard], score }; 
-}
-
-
 export function canMove(
   board: SquareType[][],
   blockShape: SquareType[][],
@@ -65,3 +52,15 @@ export function canMove(
 
   return true;
 }
+
+export function clearRows(board: SquareType[][], score: number): { board: SquareType[][], score: number } {
+  const clearedBoard = board.filter(row => !canClearRow(row));
+  const numberOfRowsCleared = board.length - clearedBoard.length; 
+
+  score = updateScore(numberOfRowsCleared, score);
+
+  const emptyRows = Array.from({ length: numberOfRowsCleared }, () => Array(board[0].length).fill(Empty.E));
+  
+  return { board: [...emptyRows, ...clearedBoard], score }; 
+}
+

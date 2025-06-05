@@ -12,7 +12,7 @@ app.use(express.json());
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5174","http://localhost:5173"],
+    origin: ["http://localhost:3000", "http://localhost:5174","http://localhost:5173","http://my-app:5173"],
     methods: ["GET", "POST"]
   }
 });

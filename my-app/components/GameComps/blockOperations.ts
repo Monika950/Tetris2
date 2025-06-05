@@ -1,4 +1,4 @@
-import { SquareType, Empty } from "../types";
+import { SquareType, Empty } from "../GameComps/types";
 
 export function rotateBlock(blockShape: SquareType[][]): SquareType[][] {
     const shapeHeight = blockShape.length;

@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Board from "../components/Board";
-import ScoreBoard from "../components/ScoreBoard";
-import Preview from "../components/Preview";
-import useBoard from "../hooks/useBoard";
-import RestartMenu from "../components/RestartMenu";
-import { openFile, closeFile } from "../api/file";
-import { rotateBlock, canMove} from "./blockOperations.ts";
-import {getRandomBlock} from "../components/blockShapes";
+import Board from "../GameComps/Board";
+import ScoreBoard from "../ScoreBoard";
+import Preview from "../Preview";
+import useBoard from "../../hooks/useBoard";
+import RestartMenu from "../RestartMenu";
+import { openFile, closeFile } from "../../api/file";
+import { rotateBlock} from "../GameComps/blockOperations.ts";
+import { canMove} from "../GameComps/boardOperations.ts";
+import {getRandomBlock} from "../blockShapes";
 //import { writeFile } from "../api/file";
 
-import { socket } from '../api/socket';
+import { socket } from '../../api/socket';
 
 function PlayerGame() {
   const {

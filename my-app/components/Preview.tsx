@@ -1,6 +1,6 @@
 import React from 'react';
-import { SquareType } from './types';
-import Square from './Square';
+import { SquareType } from './GameComps/types';
+import Square from './GameComps/Square';
 
 interface PreviewProps {
   shape?: SquareType[][] | null; 

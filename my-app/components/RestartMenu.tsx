@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import "./RestartMenu.css";
+import "./restartMenu.css";
 
 interface PopupProps {
   score: number;
