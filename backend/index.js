@@ -52,18 +52,30 @@ io.on('connection', (socket) => {
   });
 
   socket.on('gameAction', (actionData) => {
-    if (fileDescriptor) {
-      const actionLine = `${actionData.event}\n`;
-      fs.write(fileDescriptor, actionLine, (err) => {
-        if (err) {
-          console.error("Error writing action to file:", err);
-        } else {
-          console.log("Action recorded:", actionLine.trim());
-        }
-      });
-    } else {
-      console.warn("No file is open; action not recorded.");
-    }
+    // if (fileDescriptor) {
+    //   const actionLine = `${actionData.event}\n`;
+    //   fs.write(fileDescriptor, actionLine, (err) => {
+    //     if (err) {
+    //       console.error("Error writing action to file:", err);
+    //     } else {
+    //       console.log("Action recorded:", actionLine.trim());
+    //     }
+    //   });
+    // } else {
+    //   console.warn("No file is open; action not recorded.");
+    // }
+      const action = new GameAction({
+    socketId: socket.id,
+    event: actionData.event,
+    sessionId: actionData.sessionId || 'default-session'  // if using session IDs
+  });
+
+  action.save().then(() => {
+    console.log('Action saved to MongoDB:', action.event);
+  }).catch(err => {
+    console.error('Failed to save action:', err);
+  });
+
   });
 
   socket.on('disconnect', () => {
@@ -118,45 +130,71 @@ app.post('/file/open', (req, res) => {
     }
   });
 
-  app.get('/file/read', (req, res) => {
-    const fileName = req.query.fileName;
+  // app.get('/file/read', (req, res) => {
+  //   const fileName = req.query.fileName;
   
-    if (!fileName) {
-      return res.status(400).json({ message: 'No file name provided' });
-    }
+  //   if (!fileName) {
+  //     return res.status(400).json({ message: 'No file name provided' });
+  //   }
   
-    const filePath = path.join(__dirname, fileName);
+  //   const filePath = path.join(__dirname, fileName);
   
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-      if (err) {
-        return res.status(404).json({ message: 'File not found' });
-      }
+  //   fs.access(filePath, fs.constants.F_OK, (err) => {
+  //     if (err) {
+  //       return res.status(404).json({ message: 'File not found' });
+  //     }
   
-      fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-          return res.status(500).json({ message: 'Error reading file', error: err.message });
-        }
-        console.log('File Content:', data)
-        res.status(200).json({ content: data });
-      });
-    });
-  });
+  //     fs.readFile(filePath, 'utf8', (err, data) => {
+  //       if (err) {
+  //         return res.status(500).json({ message: 'Error reading file', error: err.message });
+  //       }
+  //       console.log('File Content:', data)
+  //       res.status(200).json({ content: data });
+  //     });
+  //   });
+  // });
 
-  app.get('/files', (req, res) => {
-    //const directoryPath = path.join(__dirname, 'your-folder');
-    const directoryPath = __dirname;  
+  app.get('/file/read', async (req, res) => {
+  const { sessionId } = req.query;
+
+  if (!sessionId) {
+    return res.status(400).json({ message: 'No session ID provided' });
+  }
+
+  try {
+    const actions = await GameAction.find({ sessionId }).sort({ timestamp: 1 });
+    res.status(200).json({ actions });
+  } catch (err) {
+    console.error('Error reading from DB:', err);
+    res.status(500).json({ message: 'Failed to fetch actions', error: err.message });
+  }
+});
+
+
+  // app.get('/files', (req, res) => {
+  //   //const directoryPath = path.join(__dirname, 'your-folder');
+  //   const directoryPath = __dirname;  
   
-    fs.readdir(directoryPath, (err, files) => {
-      if (err) {
-        console.error('Error reading directory:', err);
-        return res.status(500).json({ message: 'Failed to read directory', error: err.message });
-      }
+  //   fs.readdir(directoryPath, (err, files) => {
+  //     if (err) {
+  //       console.error('Error reading directory:', err);
+  //       return res.status(500).json({ message: 'Failed to read directory', error: err.message });
+  //     }
   
-      const txtFiles = files.filter(file => path.extname(file) === '.txt');
+  //     const txtFiles = files.filter(file => path.extname(file) === '.txt');
   
-      res.json({ files: txtFiles });
-    });
-  });
+  //     res.json({ files: txtFiles });
+  //   });
+  // });
+  app.get('/files', async (req, res) => {
+  try {
+    const sessions = await GameAction.distinct('sessionId');
+    res.status(200).json({ sessions });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to get sessions', error: err.message });
+  }
+});
+
 
 server.listen(port, function() {
   console.log(`Listening on port ${port}`);
