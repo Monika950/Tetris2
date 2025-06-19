@@ -10,6 +10,28 @@ const path = require('path');
 app.use(cors()); 
 app.use(express.json());
 
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost:27017/gameLogs', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+const { Schema, model } = mongoose;
+
+const GameActionSchema = new Schema({
+  socketId: String,
+  event: String,
+  timestamp: { type: Date, default: Date.now },
+  sessionId: String
+});
+
+const GameAction = model('GameAction', GameActionSchema);
+
 const io = require('socket.io')(server, {
   cors: {
     origin: ["http://localhost:3000", "http://localhost:5174","http://localhost:5173","http://my-app:5173"],
