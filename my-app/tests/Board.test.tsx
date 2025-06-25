@@ -2,8 +2,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import "@testing-library/jest-dom";
-import Board from "../components/Board";
-import { SquareType, Empty, Block } from "../components/types";
+import Board from "../components/GameComps/Board";
+import { SquareType, Empty, Block } from "../components/GameComps/types";
 
 describe("Board Component", () => {
   it("renders with an empty board", () => {

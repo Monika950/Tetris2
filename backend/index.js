@@ -12,7 +12,9 @@ app.use(express.json());
 
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/gameLogs', {
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/gameLogs';
+
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
